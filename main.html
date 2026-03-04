@@ -1,0 +1,1749 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Main Page</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="theme.css">
+  <style>
+    .glass {
+      backdrop-filter: blur(8px);
+      background: rgba(30, 30, 30, 0.6);
+    }
+
+    pre.code {
+      background: #0f172a;
+      color: #a5b4fc;
+      padding: 1rem;
+      border-radius: .5rem;
+      overflow: auto;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #0f172a, #1e1e2f, #111);
+      color: #f8fafc;
+    }
+
+    .neon-border {
+      box-shadow: 0 0 12px rgba(99, 102, 241, 0.7), inset 0 0 8px rgba(139, 92, 246, 0.6);
+    }
+
+    .neon-text {
+      color: #c4b5fd;
+      text-shadow: 0 0 6px #818cf8, 0 0 12px #6366f1;
+    }
+
+    .btn-glow:hover {
+      box-shadow: 0 0 10px #6366f1, 0 0 20px #a855f7;
+    }
+
+    /* PlantUML container */
+    .plantuml-container {
+      background: #0f172a !important;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      border: 1px solid #3730a3;
+      min-height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Loading spinner */
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .spinner {
+      animation: spin 1s linear infinite;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen text-gray-100">
+  <header class="max-w-7xl mx-auto p-6 flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <div>
+        <h1 class="text-3xl font-bold neon-text">Diagram AI</h1>
+        <p class="text-sm text-indigo-300">Syntax To Structure</p>
+      </div>
+    </div>
+    <div id="authButtons" class="flex items-center gap-3">
+      <a href="signup.html"
+        class="px-4 py-2 rounded-md text-sm border border-indigo-500 text-indigo-300 hover:bg-indigo-600/20 btn-glow">Sign
+        Up</a>
+      <a href="login.html"
+        class="px-4 py-2 bg-indigo-600 text-white rounded-md shadow-md hover:bg-indigo-700 btn-glow">Log In</a>
+    </div>
+    <div id="userProfile" class="hidden flex items-center gap-4">
+      <a href="history.html"
+        class="px-3 py-1.5 border border-indigo-500/50 text-indigo-400 text-xs rounded hover:bg-indigo-600/10 transition-all flex items-center gap-2">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        History
+      </a>
+      <div class="text-right">
+        <p class="text-xs text-indigo-400">Welcome back,</p>
+        <p id="displayUsername" class="text-sm font-bold neon-text"></p>
+      </div>
+      <button id="logoutBtn"
+        class="px-3 py-1.5 border border-red-500/50 text-red-400 text-xs rounded hover:bg-red-500/10 transition-all">Log
+        Out</button>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-6 pb-12">
+    <!-- Mode Toggle -->
+    <br>
+
+    <div class="flex flex-col gap-6">
+      <!-- Input column -->
+      <section class="w-full space-y-4 bg-gray-900/40 p-5 rounded-xl neon-border">
+        <label class="text-sm font-medium text-indigo-300">Project description</label>
+        <textarea id="projectText" rows="12"
+          class="w-full rounded-md bg-gray-800 text-gray-200 border-indigo-700 shadow-sm p-3 resize-vertical focus:ring-2 focus:ring-indigo-500"
+          placeholder="Describe your diagram"></textarea>
+
+        <!-- Diagram Mode Options -->
+        <div id="diagramOptions" class="bg-gray-800/70 rounded-md p-4 border border-indigo-700">
+          <label class="text-sm font-medium text-indigo-300">Diagram type</label>
+          <div class="mt-2 grid grid-cols-2 gap-2">
+            <button data-type="class"
+              class="diagramType btn-type flex items-center justify-center gap-2 px-3 py-2 rounded-md border border-indigo-400 ring-1 ring-indigo-300 hover:bg-indigo-700/40 btn-glow">Class</button>
+            <button data-type="sequence"
+              class="diagramType btn-type flex items-center justify-center gap-2 px-3 py-2 rounded-md border border-indigo-700 hover:bg-indigo-700/40 btn-glow">Sequence</button>
+            <button data-type="usecase"
+              class="diagramType btn-type flex items-center justify-center gap-2 px-3 py-2 rounded-md border border-indigo-700 hover:bg-indigo-700/40 btn-glow">Use-case</button>
+            <button data-type="erd"
+              class="diagramType btn-type flex items-center justify-center gap-2 px-3 py-2 rounded-md border border-indigo-700 hover:bg-indigo-700/40 btn-glow">ERD</button>
+          </div>
+
+          <div class="mt-4">
+            <label class="text-sm font-medium text-indigo-300">Programming Language</label>
+            <select id="languageSelect"
+              class="mt-2 w-full rounded-md bg-gray-700 text-gray-200 border-indigo-700 shadow-sm p-2 focus:ring-2 focus:ring-indigo-500">
+              <option value="python">Python</option>
+              <option value="javascript">JavaScript</option>
+              <option value="java">Java</option>
+              <option value="cpp">C++</option>
+              <option value="sql">SQL</option>
+            </select>
+          </div>
+
+          <div class="mt-4 text-sm text-indigo-300">
+            <label class="font-medium">Options</label>
+            <div class="mt-2 flex flex-col gap-2">
+              <label class="inline-flex items-center gap-2"><input id="autoChoose" type="checkbox"
+                  class="rounded bg-gray-700"> <span>Auto-detect best diagram</span></label>
+              <label class="inline-flex items-center gap-2"><input id="includeRelations" type="checkbox"
+                  class="rounded bg-gray-700" checked> <span>Include relationships</span></label>
+            </div>
+          </div>
+
+          <div class="mt-4 flex gap-2">
+            <button id="generateBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-md btn-glow">Generate
+              Diagram</button>
+            <button id="clearBtn"
+              class="px-4 py-2 border border-indigo-700 rounded-md hover:bg-indigo-700/40 btn-glow">Clear</button>
+          </div>
+        </div>
+
+        <!-- Code Generation Options (REMOVED) -->
+
+        <div class="glass p-3 rounded-md shadow-inner text-sm text-indigo-200">
+          <p class="font-medium text-indigo-400">Prompt helper</p>
+          <ul class="mt-2 space-y-1">
+            <li>• Mention actors or user roles (Hacker, AI, Admin)</li>
+            <li>• Describe entities (NeuralNet, CyberDrone, Database)</li>
+            <li>• Describe interactions (upload -> analyze -> visualize)</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Preview + Code column -->
+      <section id="previewSection"
+        class="w-full space-y-4 bg-gray-900/40 p-5 rounded-xl neon-border border-2 border-indigo-500/50">
+        <div class="flex items-center justify-between">
+          <h2 id="previewTitle" class="text-lg font-semibold text-indigo-300">Diagram Preview</h2>
+          <div id="diagramActions" class="flex items-center gap-2 relative">
+            <div class="relative">
+              <button id="exportMenuBtn"
+                class="px-4 py-2 bg-indigo-600/80 text-white rounded-md text-sm hover:bg-indigo-700 btn-glow flex items-center gap-2 border border-indigo-500">
+                Export
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </button>
+              <div id="exportMenu"
+                class="hidden absolute right-0 mt-2 w-48 rounded-md shadow-xl bg-gray-800 border border-indigo-500/50 ring-1 ring-black ring-opacity-5 z-50 overflow-hidden">
+                <div class="py-1" role="menu" aria-orientation="vertical">
+                  <button id="exportPNG"
+                    class="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-indigo-600/50 hover:text-white transition-colors"
+                    role="menuitem">PNG Image</button>
+                  <button id="exportJPG"
+                    class="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-indigo-600/50 hover:text-white transition-colors"
+                    role="menuitem">JPG Image</button>
+                  <button id="exportSVG"
+                    class="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-indigo-600/50 hover:text-white transition-colors"
+                    role="menuitem">SVG Vector</button>
+                  <button id="exportPDF"
+                    class="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-indigo-600/50 hover:text-white transition-colors"
+                    role="menuitem">PDF Document</button>
+                </div>
+              </div>
+            </div>
+            <button id="visualEditorBtn"
+              class="px-3 py-1 bg-indigo-600 text-white rounded-md text-sm hover:bg-indigo-700 btn-glow flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
+                </path>
+              </svg>
+              Visual Editor
+            </button>
+          </div>
+        </div>
+    </div>
+
+    <br>
+
+    <!-- Diagram Preview Area -->
+    <div id="diagramPreviewArea"
+      class="rounded-md border border-indigo-700 bg-gray-800 p-4 min-h-[380px] flex flex-col gap-3">
+      <div id="previewCanvas" class="flex-1 rounded-md p-2 bg-gray-900 border border-indigo-800 overflow-auto">
+        <div id="placeholder" class="h-full w-full flex items-center justify-center text-indigo-500">
+          <div class="text-center">
+            <svg class="mx-auto mb-3 animate-pulse" width="96" height="96" viewBox="0 0 24 24" fill="none"
+              xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 7h4v10H3zM17 7h4v10h-4zM10 5h4v14h-4z" fill="currentColor" opacity="0.2" />
+            </svg>
+            <div class="text-sm">Awaiting generation...</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-gray-900/60 rounded-md p-3">
+        <div class="flex justify-between items-center mb-2">
+          <span class="font-medium text-indigo-300">PlantUML Source</span>
+          <button id="editBtn"
+            class="px-2 py-1 text-xs border border-indigo-600 rounded-md text-indigo-300 hover:bg-indigo-700/40 btn-glow">Edit</button>
+        </div>
+
+        <!-- View Mode -->
+        <pre id="diagramSource" class="code max-h-60 overflow-auto">// generated PlantUML code will appear here</pre>
+
+        <!-- Edit Mode -->
+        <div id="editArea" class="hidden">
+          <textarea id="plantumlEditor"
+            class="w-full h-60 bg-gray-800 text-indigo-300 p-2 rounded-md font-mono text-xs border border-indigo-700 focus:ring-1 focus:ring-indigo-500 mb-2"
+            spellcheck="false"></textarea>
+          <div class="flex justify-end gap-2">
+            <button id="cancelEditBtn" class="px-3 py-1 text-xs text-gray-400 hover:text-white">Cancel</button>
+            <button id="renderBtn"
+              class="px-3 py-1 text-xs bg-indigo-600 text-white rounded-md btn-glow shadow-sm">Render Changes</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Generated Code Section -->
+      <div class="bg-gray-900/60 rounded-md p-3">
+        <div class="font-medium text-indigo-300 flex justify-between items-center mb-3">
+          <span>Generated Code</span>
+          <button id="copyCode"
+            class="px-2 py-1 text-xs border border-indigo-600 rounded-md text-indigo-300 hover:bg-indigo-700/40 btn-glow">Copy</button>
+        </div>
+        <pre id="codeOutput" class="code text-sm">// generated code will appear here</pre>
+      </div>
+    </div>
+
+    <!-- Code Preview Area (REMOVED) -->
+
+    <!-- Native "Pro" Visual Editor -->
+    <div id="nativeEditorArea"
+      class="rounded-md border border-indigo-700 bg-gray-900 flex hidden h-[650px] overflow-hidden shadow-2xl relative">
+
+      <!-- 1. LEFT SIDEBAR: Components -->
+      <div class="w-48 bg-gray-800 border-r border-indigo-800 flex flex-col z-20">
+        <div class="p-3 border-b border-indigo-800 bg-gray-900/50">
+          <h3 class="text-xs font-bold text-indigo-300 uppercase tracking-wider">Components</h3>
+        </div>
+        <div class="p-2 space-y-2 overflow-y-auto flex-1 custom-scrollbar">
+          <!-- Draggable Shapes -->
+          <div
+            class="draggable-shape cursor-grab p-2 bg-gray-700 rounded border border-indigo-600/50 hover:border-indigo-400 hover:bg-gray-600 transition-all group"
+            draggable="true" data-type="class">
+            <div class="flex items-center gap-2 mb-1">
+              <div class="w-3 h-3 rounded bg-indigo-500"></div>
+              <span class="text-sm text-gray-200 font-medium">Class</span>
+            </div>
+          </div>
+
+          <div
+            class="draggable-shape cursor-grab p-2 bg-gray-700 rounded border border-indigo-600/50 hover:border-indigo-400 hover:bg-gray-600 transition-all group"
+            draggable="true" data-type="interface">
+            <div class="flex items-center gap-2 mb-1">
+              <div class="w-3 h-3 rounded-full border border-indigo-400"></div>
+              <span class="text-sm text-gray-200 font-medium">Interface</span>
+            </div>
+          </div>
+
+          <div
+            class="draggable-shape cursor-grab p-2 bg-gray-700 rounded border border-indigo-600/50 hover:border-indigo-400 hover:bg-gray-600 transition-all group"
+            draggable="true" data-type="note">
+            <div class="flex items-center gap-2 mb-1">
+              <div class="w-3 h-3 bg-yellow-600 transform rotate-45"></div>
+              <span class="text-sm text-gray-200 font-medium">Note</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. CENTER: Canvas -->
+      <div class="flex-1 relative bg-[#1e1e2f] overflow-hidden" id="mainCanvasContainer">
+        <!-- Grid Background -->
+        <div class="absolute inset-0 opacity-20 pointer-events-none"
+          style="background-image: linear-gradient(#4f46e5 1px, transparent 1px), linear-gradient(90deg, #4f46e5 1px, transparent 1px); background-size: 20px 20px;">
+        </div>
+
+        <!-- Toolbar Overlay -->
+        <div
+          class="absolute top-4 left-1/2 transform -translate-x-1/2 bg-gray-800/90 border border-indigo-500/50 rounded-full px-4 py-2 flex items-center gap-3 shadow-lg z-30 backdrop-blur-sm">
+          <button id="toolbarSave" class="text-gray-400 hover:text-indigo-400 transition-colors" title="Save Model"><svg
+              class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+            </svg></button>
+          <div class="w-px h-4 bg-gray-600"></div>
+          <button id="toolbarUndo" class="text-gray-400 hover:text-white transition-colors"><svg class="w-4 h-4"
+              fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg></button>
+          <button id="toolbarRedo" class="text-gray-400 hover:text-white transition-colors"><svg class="w-4 h-4"
+              fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg></button>
+          <div class="w-px h-4 bg-gray-600"></div>
+          <button id="toolbarZoomIn" class="text-gray-400 hover:text-white transition-colors"><svg class="w-4 h-4"
+              fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg></button>
+          <button id="toolbarZoomOut" class="text-gray-400 hover:text-white transition-colors"><svg class="w-4 h-4"
+              fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+            </svg></button>
+        </div>
+
+        <!-- SVG Layer for Connections -->
+        <svg id="connectionsLayer"
+          class="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-visible"></svg>
+
+        <!-- HTML Layer for Nodes -->
+        <div id="nodesLayer" class="absolute inset-0 w-full h-full z-10 transform-gpu origin-top-left"></div>
+      </div>
+
+      <!-- 3. RIGHT SIDEBAR: Properties -->
+      <div class="w-64 bg-gray-800 border-l border-indigo-800 flex flex-col z-20">
+        <div class="p-3 border-b border-indigo-800 bg-gray-900/50">
+          <h3 class="text-xs font-bold text-indigo-300 uppercase tracking-wider">Properties</h3>
+        </div>
+
+        <div id="propertiesContent" class="p-4 space-y-4 overflow-y-auto flex-1">
+          <!-- Empty State -->
+          <div id="noSelectionMsg" class="text-center text-gray-500 text-sm mt-10">
+            Select an element to edit properties
+          </div>
+
+          <!-- Active Property Form (Hidden by default) -->
+          <div id="propertyForm" class="space-y-4 hidden">
+            <div>
+              <label class="block text-xs font-medium text-gray-400 mb-1">Name</label>
+              <input id="propName" type="text"
+                class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm text-white focus:border-indigo-500 focus:outline-none">
+            </div>
+
+            <div>
+              <label class="block text-xs font-medium text-gray-400 mb-1">Type</label>
+              <select id="propType"
+                class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm text-white focus:border-indigo-500 focus:outline-none">
+                <option value="class">Class</option>
+                <option value="interface">Interface</option>
+                <option value="abstract">Abstract Class</option>
+                <option value="enum">Enum</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-medium text-gray-400 mb-1">Attributes (one per line)</label>
+              <textarea id="propAttributes" rows="4"
+                class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm text-white font-mono focus:border-indigo-500 focus:outline-none"></textarea>
+            </div>
+
+            <div>
+              <label class="block text-xs font-medium text-gray-400 mb-1">Methods (one per line)</label>
+              <textarea id="propMethods" rows="4"
+                class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm text-white font-mono focus:border-indigo-500 focus:outline-none"></textarea>
+            </div>
+
+            <div class="pt-4 border-t border-gray-700">
+              <button id="deleteNodeBtn"
+                class="w-full py-1 bg-red-900/50 text-red-200 border border-red-800 rounded text-sm hover:bg-red-900 transition-colors">Delete
+                Element</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Generate/Export -->
+        <div class="p-3 border-t border-indigo-800 bg-gray-900/50 flex gap-2">
+          <button id="nativeRenderBtn"
+            class="flex-1 py-2 bg-indigo-600 text-white rounded text-sm font-medium shadow-lg hover:bg-indigo-500 transition-all btn-glow uppercase tracking-wider">Render</button>
+          <button id="fullEditorBtn"
+            class="flex-1 py-2 bg-indigo-900/40 border border-indigo-500/50 text-indigo-200 rounded text-sm font-medium hover:bg-indigo-900 transition-all flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+            </svg>
+            FULL EDITOR
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="max-w-7xl mx-auto p-6 text-center text-xs text-indigo-400">Made By ⚡ Rashad, Omar, Abdelrahman,
+    Mohamed.</footer>
+
+  <script>
+    // Global state
+    const types = document.querySelectorAll('.diagramType');
+    let currentType = 'class';
+    let currentMode = 'diagram';
+    let lastDiagramResponse = null;
+    let currentUser = null;
+
+    // Check Authentication
+    function checkAuth() {
+      const userData = localStorage.getItem('user');
+      const authButtons = document.getElementById('authButtons');
+      const userProfile = document.getElementById('userProfile');
+      const displayUsername = document.getElementById('displayUsername');
+
+      if (userData) {
+        currentUser = JSON.parse(userData);
+        authButtons.classList.add('hidden');
+        userProfile.classList.remove('hidden');
+        displayUsername.textContent = currentUser.username;
+      } else {
+        authButtons.classList.remove('hidden');
+        userProfile.classList.add('hidden');
+      }
+    }
+
+    // Handle Logout
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('user');
+      window.location.reload();
+    });
+
+    // Run auth check on load
+    checkAuth();
+
+    // Check for loaded project from history
+    window.addEventListener('load', () => {
+      const loadedProject = localStorage.getItem('loaded_project');
+      if (loadedProject) {
+        const project = JSON.parse(loadedProject);
+        localStorage.removeItem('loaded_project'); // Clear it so it doesn't reload every time
+
+        // Fill fields
+        document.getElementById('projectText').value = project.description;
+        document.getElementById('languageSelect').value = project.language || 'python';
+
+        // Set diagram type
+        currentType = project.diagram_type;
+        types.forEach(btn => {
+          btn.classList.remove('border-indigo-400', 'ring-1', 'ring-indigo-300');
+          if (btn.dataset.type === currentType) {
+            btn.classList.add('border-indigo-400', 'ring-1', 'ring-indigo-300');
+          }
+        });
+
+        // If source is available, render it
+        if (project.plantuml_source) {
+          document.getElementById('diagramSource').textContent = project.plantuml_source;
+          document.getElementById('codeOutput').textContent = project.generated_code || '// No code generated';
+
+          // Trigger render
+          plantumlEditor.value = project.plantuml_source;
+          renderBtn.click();
+        }
+      }
+    });
+
+    // Mode toggle functionality
+    const modeDiagram = document.getElementById('modeDiagram');
+    const modeInteractive = document.getElementById('modeInteractive');
+
+    const diagramPreviewArea = document.getElementById('diagramPreviewArea');
+
+    const diagramOptions = document.getElementById('diagramOptions');
+    const diagramActions = document.getElementById('diagramActions');
+
+    let currentDiagramModel = null;
+
+    function switchMode(mode) {
+      currentMode = mode;
+
+      // Reset all
+      if (diagramPreviewArea) diagramPreviewArea.classList.add('hidden');
+      const nativeArea = document.getElementById('nativeEditorArea');
+      if (nativeArea) nativeArea.classList.add('hidden');
+      const drawioArea = document.getElementById('inlineDrawioArea');
+      if (drawioArea) drawioArea.classList.add('hidden');
+
+      modeDiagram.classList.remove('border-indigo-400', 'ring-1', 'ring-indigo-300', 'bg-indigo-600/20');
+      modeInteractive.classList.remove('border-indigo-400', 'ring-1', 'ring-indigo-300', 'bg-indigo-600/20');
+
+      if (mode === 'diagram') {
+        diagramPreviewArea.classList.remove('hidden');
+        diagramOptions.classList.remove('hidden');
+        diagramActions.classList.remove('hidden');
+        document.getElementById('previewTitle').textContent = 'Diagram & Code Preview';
+        modeDiagram.classList.add('border-indigo-400', 'ring-1', 'ring-indigo-300', 'bg-indigo-600/20');
+      } else if (mode === 'interactive') {
+        document.getElementById('nativeEditorArea').classList.remove('hidden');
+        diagramPreviewArea.classList.add('hidden');
+        diagramOptions.classList.remove('hidden');
+        diagramActions.classList.remove('hidden');
+        document.getElementById('previewTitle').textContent = 'Native Pro Editor';
+        modeInteractive.classList.add('border-indigo-400', 'ring-1', 'ring-indigo-300', 'bg-indigo-600/20');
+
+        enterNativeMode();
+      }
+    }
+
+    if (modeDiagram) modeDiagram.addEventListener('click', () => switchMode('diagram'));
+    if (modeInteractive) modeInteractive.addEventListener('click', () => switchMode('interactive'));
+
+
+
+    // Set initial active state for diagram types
+    types.forEach(btn => {
+      if (btn.dataset.type === 'class') {
+        btn.classList.add('border-indigo-400', 'ring-1', 'ring-indigo-300');
+      }
+      btn.addEventListener('click', () => {
+        types.forEach(b => b.classList.remove('border-indigo-400', 'ring-1', 'ring-indigo-300'));
+        btn.classList.add('border-indigo-400', 'ring-1', 'ring-indigo-300');
+        currentType = btn.dataset.type;
+      });
+    });
+
+    // Edit Mode Logic
+    const editArea = document.getElementById('editArea');
+    const diagramSource = document.getElementById('diagramSource');
+    const editBtn = document.getElementById('editBtn');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
+    const renderBtn = document.getElementById('renderBtn');
+    const plantumlEditor = document.getElementById('plantumlEditor');
+
+    if (editBtn) {
+      editBtn.addEventListener('click', () => {
+        if (plantumlEditor && diagramSource) {
+          plantumlEditor.value = diagramSource.textContent;
+          editArea.classList.remove('hidden');
+          diagramSource.classList.add('hidden');
+          editBtn.classList.add('hidden');
+        }
+      });
+    }
+
+    if (cancelEditBtn) {
+      cancelEditBtn.addEventListener('click', () => {
+        if (editArea && diagramSource && editBtn) {
+          editArea.classList.add('hidden');
+          diagramSource.classList.remove('hidden');
+          editBtn.classList.remove('hidden');
+        }
+      });
+    }
+
+    if (visualEditorBtn) {
+      visualEditorBtn.addEventListener('click', () => {
+        // Open the new Native Pro Editor
+        localStorage.setItem('nexus_current_model', JSON.stringify(currentDiagramModel || { entities: [], relationships: [] }));
+        window.open('editor.html', '_blank');
+      });
+    }
+
+    const closeInlineDrawioBtn = document.getElementById('closeInlineDrawioBtn');
+    if (closeInlineDrawioBtn) {
+      closeInlineDrawioBtn.addEventListener('click', () => {
+        const drawioArea = document.getElementById('inlineDrawioArea');
+        if (drawioArea) drawioArea.classList.add('hidden');
+        if (previewArea) previewArea.classList.remove('hidden');
+      });
+    }
+
+    // Handle Draw.io content loading
+    // Handle Draw.io content loading
+    window.addEventListener('message', (event) => {
+      if (event.origin.indexOf('diagrams.net') === -1 && event.origin.indexOf('draw.io') === -1) return;
+
+      // Check if it's our frame
+      const frame = document.getElementById('inlineDrawioFrame');
+      if (!frame || event.source !== frame.contentWindow) return;
+
+      const msg = JSON.parse(event.data);
+
+      if (msg.event === 'init') {
+        // Draw.io is ready.
+        const plantuml = document.getElementById('diagramSource').textContent;
+
+        // Copy PlantUML to clipboard
+        navigator.clipboard.writeText(plantuml).then(() => {
+          // Show instruction to user via a toast/overlay INSIDE the editor area
+          const notification = document.createElement('div');
+          notification.className = 'absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-indigo-900/95 border border-indigo-500 text-white p-6 rounded-lg shadow-2xl z-[60] text-center backdrop-blur-sm';
+          notification.innerHTML = `
+          <h3 class="text-xl font-bold mb-2 text-indigo-200">Draw.io Ready</h3>
+          <div class="space-y-4">
+             <div class="bg-gray-800/80 p-3 rounded border border-indigo-500/30">
+                <p class="text-sm text-gray-300 mb-2">Diagram code copied to clipboard!</p>
+                <div class="flex justify-center gap-2">
+                    <kbd class="font-mono bg-indigo-600 px-3 py-1 rounded shadow text-xs">Ctrl + V</kbd>
+                    <span class="text-gray-500 text-xs self-center">to paste</span>
+                </div>
+             </div>
+             <button id="closeInlineNotif" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded transition-colors text-sm font-medium">Start Drawing</button>
+          </div>
+        `;
+
+          // Append to the inline area container
+          const container = document.getElementById('inlineDrawioArea');
+          if (container) {
+            container.appendChild(notification);
+            document.getElementById('closeInlineNotif').addEventListener('click', () => notification.remove());
+            setTimeout(() => { if (notification.parentNode) notification.remove(); }, 6000);
+          }
+        });
+
+        // Load an empty graph
+        frame.contentWindow.postMessage(JSON.stringify({
+          action: 'load',
+          autosave: 1,
+          xml: '<mxGraphModel><root><mxCell id="0"/><mxCell id="1" parent="0"/></root></mxGraphModel>'
+        }), '*');
+      }
+    });
+
+    renderBtn.addEventListener('click', async () => {
+      document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
+      const newCode = plantumlEditor.value;
+      const originalText = renderBtn.textContent;
+
+      try {
+        renderBtn.textContent = 'Rendering...';
+        renderBtn.disabled = true;
+
+        const response = await fetch('http://127.0.0.1:8002/render', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ plantuml_code: newCode })
+        });
+
+        if (!response.ok) {
+          throw new Error('Rendering failed');
+        }
+
+        const result = await response.json();
+
+        // Update preview
+        if (result.diagram_png_base64) {
+          displayBase64PNG(result.diagram_png_base64);
+        }
+
+        // Update source view
+        diagramSource.textContent = newCode;
+
+        // Update global state for download
+        if (lastDiagramResponse) {
+          lastDiagramResponse.diagram_source = newCode;
+          lastDiagramResponse.diagram_png_base64 = result.diagram_png_base64;
+          lastDiagramResponse.encoded_plantuml = result.encoded_plantuml;
+        } else {
+          lastDiagramResponse = {
+            diagram_source: newCode,
+            diagram_png_base64: result.diagram_png_base64,
+            encoded_plantuml: result.encoded_plantuml
+          };
+        }
+
+        // Try to keep the interactive editors in sync by parsing
+        // the edited PlantUML back into a structured model.
+        try {
+          const modelResp = await fetch('http://127.0.0.1:8002/parse-plantuml-to-model', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ plantuml_code: newCode })
+          });
+
+          if (modelResp.ok) {
+            const parsedModel = await modelResp.json();
+            currentDiagramModel = cleanOrphanedRelationships(parsedModel);
+            // Persist for both inline native editor and full editor
+            localStorage.setItem('nexus_current_model', JSON.stringify(currentDiagramModel));
+
+            // Also attach to lastDiagramResponse for completeness
+            if (lastDiagramResponse) {
+              lastDiagramResponse.diagram_model = currentDiagramModel;
+            }
+          } else {
+            console.warn('parse-plantuml-to-model failed with status', modelResp.status);
+          }
+        } catch (parseErr) {
+          console.warn('Failed to parse PlantUML back into model:', parseErr);
+        }
+
+        // Exit edit mode
+        editArea.classList.add('hidden');
+        diagramSource.classList.remove('hidden');
+        editBtn.classList.remove('hidden');
+
+
+      } catch (error) {
+        console.error('Render error:', error);
+        alert('Failed to render changes: ' + error.message);
+      } finally {
+        renderBtn.disabled = false;
+        enableExport();
+      }
+
+    });
+
+    // Generate button event listener
+    document.getElementById('generateBtn').addEventListener('click', async () => {
+      const text = document.getElementById('projectText').value.trim();
+      if (!text) { alert('Enter a project description first.'); return; }
+
+      document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
+
+      const generateBtn = document.getElementById('generateBtn');
+      const originalText = generateBtn.textContent;
+
+      // Get the selected language
+      const selectedLanguage = document.getElementById('languageSelect').value;
+      console.log('=== FRONTEND DEBUG ===');
+      console.log('Selected language:', selectedLanguage);
+      console.log('Language selector element:', document.getElementById('languageSelect'));
+      console.log('===================');
+
+      // show loading
+      generateBtn.textContent = 'Generating...';
+      generateBtn.disabled = true;
+
+      try {
+        const requestBody = {
+          description: text,
+          diagram_type: currentType,
+          auto_choose: document.getElementById('autoChoose').checked,
+          include_relations: document.getElementById('includeRelations').checked,
+          language: selectedLanguage
+        };
+
+        console.log('Request body:', requestBody);
+
+        const response = await fetch('http://127.0.0.1:8002/generate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+          throw new Error('Server error');
+        }
+
+        const result = await response.json();
+        lastDiagramResponse = result;
+
+        // Auto-save if user is logged in
+        if (currentUser) {
+          autoSaveDiagram(text, result);
+        }
+
+        // Update preview
+        if (result.diagram_png_base64) {
+          displayBase64PNG(result.diagram_png_base64);
+        }
+
+        // Update source view
+        document.getElementById('diagramSource').textContent = result.diagram_source;
+
+        // Update code view
+        document.getElementById('codeOutput').textContent = result.generated_code;
+
+        // Update global model if provided
+        if (result.diagram_model) {
+          currentDiagramModel = cleanOrphanedRelationships(result.diagram_model);
+          // Auto-save to localStorage for immediate editor availability
+          localStorage.setItem('nexus_current_model', JSON.stringify(currentDiagramModel));
+        }
+
+        // Enable download
+        enableExport();
+
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to generate diagram. Make sure the backend is running on http://127.0.0.1:8002');
+      } finally {
+        generateBtn.textContent = originalText;
+        generateBtn.disabled = false;
+      }
+    });
+
+    async function autoSaveDiagram(description, result) {
+      try {
+        const saveBody = {
+          user_id: currentUser.id,
+          title: description.split('\n')[0].substring(0, 50) || "Untitled Diagram",
+          description: description,
+          diagram_type: currentType,
+          plantuml_source: result.diagram_source,
+          generated_code: result.generated_code,
+          language: document.getElementById('languageSelect').value
+        };
+
+        const response = await fetch('http://127.0.0.1:8002/diagrams/save', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(saveBody)
+        });
+
+        if (response.ok) {
+          console.log("Diagram auto-saved successfully");
+          showToast("Diagram auto-saved to your profile!");
+        }
+      } catch (err) {
+        console.error("Auto-save failed:", err);
+      }
+    }
+
+    // Custom Toast for main page
+    function showToast(message) {
+      const toast = document.createElement('div');
+      toast.className = 'fixed top-10 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg shadow-2xl z-[100] transition-all duration-300 neon-border glass flex items-center gap-3 animate-bounce';
+      toast.innerHTML = `
+            <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            <span class="text-white font-medium">${message}</span>
+        `;
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.add('opacity-0', '-translate-y-10');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // ---------------------------------------------------------
+    // Native Visual Editor Logic (PRO)
+    // ---------------------------------------------------------
+    let diagramModel = { entities: [], relationships: [] };
+    let selectedEntityId = null;
+    let scale = 1.0;
+
+    const nativeEditorArea = document.getElementById('nativeEditorArea');
+    const nodesLayer = document.getElementById('nodesLayer');
+    const connectionsLayer = document.getElementById('connectionsLayer');
+
+    // Property Inputs
+    const propName = document.getElementById('propName');
+    const propType = document.getElementById('propType');
+    const propAttributes = document.getElementById('propAttributes');
+    const propMethods = document.getElementById('propMethods');
+    const propertyForm = document.getElementById('propertyForm');
+    const noSelectionMsg = document.getElementById('noSelectionMsg');
+
+    // Helper: Remove orphaned relationships that reference non-existent entities
+    function cleanOrphanedRelationships(model) {
+      if (!model || !model.entities || !model.relationships) return model;
+
+      // Normalize from/to -> from_id/to_id if needed
+      model.relationships.forEach(rel => {
+        if (rel.from && !rel.from_id) rel.from_id = rel.from;
+        if (rel.to && !rel.to_id) rel.to_id = rel.to;
+      });
+
+      const entityIds = new Set(model.entities.map(e => e.id));
+      const validRelationships = model.relationships.filter(rel => {
+        const fromExists = entityIds.has(rel.from_id);
+        const toExists = entityIds.has(rel.to_id);
+        if (!fromExists || !toExists) {
+          console.warn(`Removing orphaned relationship: ${rel.from_id} -> ${rel.to_id} (entities missing)`);
+          return false;
+        }
+        return true;
+      });
+      return {
+        ...model,
+        relationships: validRelationships
+      };
+    }
+
+    // Initialize Editor
+    function initNativeEditor(initialModel) {
+      const cleanedModel = cleanOrphanedRelationships(initialModel || { entities: [], relationships: [] });
+      diagramModel = cleanedModel;
+      currentDiagramModel = diagramModel; // Keep global in sync
+      renderBoard();
+      updatePropertiesPanel();
+    }
+
+    // Render Everything
+    function renderBoard() {
+      nodesLayer.innerHTML = '';
+      connectionsLayer.innerHTML = '';
+
+      // Render Entities
+      diagramModel.entities.forEach(entity => {
+        const el = createNodeElement(entity);
+        nodesLayer.appendChild(el);
+      });
+
+      // Render Relationships (Basic Lines)
+      diagramModel.relationships.forEach(rel => {
+        const from = diagramModel.entities.find(e => e.id === rel.from_id);
+        const to = diagramModel.entities.find(e => e.id === rel.to_id);
+        if (from && to) {
+          drawConnection(from, to, rel);
+        }
+      });
+    }
+
+    function createNodeElement(entity) {
+      const div = document.createElement('div');
+      div.className = `absolute bg-gray-800 border-2 rounded shadow-lg select-none cursor-move group hover:border-indigo-400 transition-colors ${selectedEntityId === entity.id ? 'border-indigo-400 ring-2 ring-indigo-500/50' : 'border-indigo-600'}`;
+      div.style.left = `${entity.x}px`;
+      div.style.top = `${entity.y}px`;
+      div.style.width = `${entity.width}px`;
+      div.style.height = `${entity.height}px`;
+      div.dataset.id = entity.id;
+
+      // Header
+      const headerColor = entity.type === 'interface' ? 'bg-teal-900/50' : 'bg-indigo-900/50';
+
+      div.innerHTML = `
+        <div class="${headerColor} p-2 border-b border-white/10 flex justify-between items-center overflow-hidden handle">
+            <span class="font-bold text-xs text-indigo-100 truncate w-full text-center">${entity.type === 'interface' ? '<<interface>> ' : ''}${entity.name}</span>
+        </div>
+        <div class="p-2 text-xs text-gray-300 overflow-hidden h-full">
+            <div class="mb-1 pb-1 border-b border-white/5 space-y-0.5">
+                ${entity.attributes.slice(0, 4).map(a => `<div class="truncate">• ${a}</div>`).join('')}
+                ${entity.attributes.length > 4 ? '<div class="text-gray-500 italic">...</div>' : ''}
+            </div>
+            <div class="space-y-0.5">
+                ${entity.methods.slice(0, 4).map(m => `<div class="truncate text-yellow-200/90">ƒ ${m}</div>`).join('')}
+                  ${entity.methods.length > 4 ? '<div class="text-gray-500 italic">...</div>' : ''}
+            </div>
+        </div>
+        
+        <!-- Resize Handle -->
+         <div class="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize opacity-0 group-hover:opacity-100 flex items-center justify-center resizer">
+            <div class="w-2 h-2 bg-indigo-500 rounded-sm"></div>
+         </div>
+      `;
+
+      // Select Logic
+      div.addEventListener('mousedown', (e) => {
+        if (!e.target.classList.contains('resizer')) {
+          selectEntity(entity.id);
+        }
+      });
+
+      // Interactions
+      enableDrag(div, entity);
+
+      return div;
+    }
+
+    function selectEntity(id) {
+      selectedEntityId = id;
+      renderBoard(); // Re-render to show selection state
+      updatePropertiesPanel();
+    }
+
+    function updatePropertiesPanel() {
+      if (!selectedEntityId) {
+        propertyForm.classList.add('hidden');
+        noSelectionMsg.classList.remove('hidden');
+        return;
+      }
+
+      const entity = diagramModel.entities.find(e => e.id === selectedEntityId);
+      if (!entity) return;
+
+      propertyForm.classList.remove('hidden');
+      noSelectionMsg.classList.add('hidden');
+
+      // Fill Form
+      propName.value = entity.name;
+      propType.value = entity.type;
+      propAttributes.value = entity.attributes.join('\n');
+      propMethods.value = entity.methods.join('\n');
+
+      // Listeners are cleared/re-added or we just use global change listeners
+    }
+
+    // Property Change Listeners
+    [propName, propType, propAttributes, propMethods].forEach(input => {
+      input.addEventListener('input', () => {
+        if (!selectedEntityId) return;
+        const entity = diagramModel.entities.find(e => e.id === selectedEntityId);
+        if (!entity) return;
+
+        if (input === propName) entity.name = input.value;
+        if (input === propType) entity.type = input.value;
+        if (input === propAttributes) entity.attributes = input.value.split('\n').filter(l => l.trim());
+        if (input === propMethods) entity.methods = input.value.split('\n').filter(l => l.trim());
+
+        renderBoard(); // Live update
+      });
+    });
+
+    // SVG Drawing
+    function drawConnection(from, to, rel) {
+      // Simple center-to-center line for now
+      const startX = from.x + from.width / 2;
+      const startY = from.y + from.height / 2;
+      const endX = to.x + to.width / 2;
+      const endY = to.y + to.height / 2;
+
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+
+      // Bezier Curve
+      const dx = endX - startX;
+      // Control points
+      const cp1x = startX + dx * 0.5;
+      const cp1y = startY;
+      const cp2x = endX - dx * 0.5;
+      const cp2y = endY;
+
+      const d = `M ${startX} ${startY} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${endX} ${endY}`;
+
+      path.setAttribute("d", d);
+      path.setAttribute("stroke", "#6366f1"); // Indigo-500
+      path.setAttribute("stroke-width", "2");
+      path.setAttribute("fill", "none");
+      if (rel.type === 'inheritance') {
+        path.setAttribute("marker-end", "url(#arrow-inheritance)");
+      } else {
+        path.setAttribute("marker-end", "url(#arrow-association)");
+      }
+
+      connectionsLayer.appendChild(path);
+    }
+
+    // Define Arrow Markers
+    const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+    defs.innerHTML = `
+    <marker id="arrow-association" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#6366f1" />
+    </marker>
+     <marker id="arrow-inheritance" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="none" stroke="#6366f1" />
+    </marker>
+  `;
+    connectionsLayer.appendChild(defs);
+
+    // Drag Logic
+    function enableDrag(element, entityRef) {
+      let isDragging = false;
+      let startX, startY;
+
+      element.querySelector('.handle').addEventListener('mousedown', (e) => {
+        isDragging = true;
+        startX = e.clientX - element.offsetLeft;
+        startY = e.clientY - element.offsetTop;
+        e.stopPropagation(); // Prevent canvas drag
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const newX = e.clientX - startX;
+        const newY = e.clientY - startY;
+
+        entityRef.x = newX;
+        entityRef.y = newY;
+
+        element.style.left = `${newX}px`;
+        element.style.top = `${newY}px`;
+
+        // Re-draw lines efficiently? For now we just re-render all lines?
+        // To optimize, we could just update connected lines.
+        // Trigger global re-render on next frame or throttle
+        requestAnimationFrame(() => {
+          connectionsLayer.innerHTML = '';
+          connectionsLayer.appendChild(defs);
+          diagramModel.relationships.forEach(rel => {
+            const from = diagramModel.entities.find(e => e.id === rel.from_id);
+            const to = diagramModel.entities.find(e => e.id === rel.to_id);
+            if (from && to) drawConnection(from, to, rel);
+          });
+        });
+      });
+
+      window.addEventListener('mouseup', () => {
+        isDragging = false;
+      });
+    }
+
+    // --- Drag & Drop from Sidebar ---
+    const draggables = document.querySelectorAll('.draggable-shape');
+    draggables.forEach(d => {
+      d.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('type', d.dataset.type);
+      });
+    });
+
+    if (mainCanvasContainer) {
+      mainCanvasContainer.addEventListener('dragover', (e) => {
+        e.preventDefault();
+      });
+
+      mainCanvasContainer.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const type = e.dataTransfer.getData('type');
+        const rect = mainCanvasContainer.getBoundingClientRect();
+        const offsetX = e.clientX - rect.left;
+        const offsetY = e.clientY - rect.top;
+
+        const newEntity = {
+          id: crypto.randomUUID(),
+          name: `New ${type.charAt(0).toUpperCase() + type.slice(1)}`,
+          type: type,
+          attributes: ['id: int'],
+          methods: [],
+          x: offsetX - 75,
+          y: offsetY - 25,
+          width: 200,
+          height: 150
+        };
+
+        diagramModel.entities.push(newEntity);
+        renderBoard();
+        selectEntity(newEntity.id);
+      });
+    }
+
+    console.log('Diagram AI Frontend initialized successfully.');
+
+    // Full Editor Integration
+    if (document.getElementById('fullEditorBtn')) {
+      document.getElementById('fullEditorBtn').addEventListener('click', () => {
+        // Save current model to localStorage for the standalone editor
+        localStorage.setItem('nexus_current_model', JSON.stringify(currentDiagramModel || { entities: [], relationships: [] }));
+        // Open the editor in a new window/tab
+        window.open('editor.html', '_blank');
+      });
+    }
+
+    // Monitor localStorage for changes from the full editor
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'nexus_current_model') {
+        try {
+          currentDiagramModel = JSON.parse(e.newValue);
+          if (currentMode === 'interactive') {
+            initNativeEditor(currentDiagramModel);
+          }
+        } catch (err) {
+          console.error('Failed to sync model', err);
+        }
+      }
+
+      // Handle rendered diagram from the editor's Save to Main button
+      if (e.key === 'nexus_rendered_diagram') {
+        try {
+          const rendered = JSON.parse(e.newValue);
+          if (!rendered) return;
+
+          // Update the diagram preview image
+          if (rendered.diagram_png_base64) {
+            displayBase64PNG(rendered.diagram_png_base64);
+          }
+
+          // Update the PlantUML source view
+          if (rendered.diagram_source) {
+            const diagramSourceEl = document.getElementById('diagramSource');
+            if (diagramSourceEl) {
+              diagramSourceEl.textContent = rendered.diagram_source;
+            }
+          }
+
+          // Update lastDiagramResponse so exports work
+          lastDiagramResponse = {
+            ...(lastDiagramResponse || {}),
+            diagram_png_base64: rendered.diagram_png_base64,
+            diagram_source: rendered.diagram_source
+          };
+
+          // Enable the export button
+          enableExport();
+
+          // Show a toast notification
+          showToast('Diagram updated from editor!');
+
+          console.log('Main page updated from editor save');
+        } catch (err) {
+          console.error('Failed to process rendered diagram', err);
+        }
+      }
+    });
+
+    // Render Button
+    if (document.getElementById('nativeRenderBtn')) {
+      document.getElementById('nativeRenderBtn').addEventListener('click', async () => {
+        document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
+        const btn = document.getElementById('nativeRenderBtn');
+        btn.textContent = 'Rendering...';
+
+        try {
+          const response = await fetch('http://127.0.0.1:8002/render-model', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model: diagramModel || currentDiagramModel })
+          });
+
+          const result = await response.json();
+          if (result.diagram_source) {
+            document.getElementById('diagramSource').textContent = result.diagram_source;
+          }
+          alert('Rendered successfully!');
+        } catch (e) {
+          alert('Error rendering');
+        } finally {
+          btn.textContent = 'Render to Diagram';
+        }
+      });
+    }
+
+    // Updated Interactive Mode entry
+    function enterNativeMode() {
+      // If we have a model, load it
+      if (currentDiagramModel) {
+        // Clean orphaned relationships first
+        currentDiagramModel = cleanOrphanedRelationships(currentDiagramModel);
+        // ensure props exist
+        currentDiagramModel.entities.forEach(e => {
+          if (!e.width) e.width = 200;
+          if (!e.height) e.height = 150;
+        });
+        initNativeEditor(currentDiagramModel);
+      } else {
+        initNativeEditor(); // Empty
+      }
+    }
+
+    // Function to display base64 PNG
+    function displayBase64PNG(base64Data) {
+      const previewCanvas = document.getElementById('previewCanvas');
+      previewCanvas.innerHTML = '';
+
+      const img = document.createElement('img');
+      img.src = `data:image/png;base64,${base64Data}`;
+      img.alt = 'PlantUML Diagram';
+      img.className = 'max-w-full h-auto mx-auto';
+      img.style.maxHeight = '400px';
+      img.style.objectFit = 'contain';
+
+      previewCanvas.appendChild(img);
+    }
+
+    // Export Menu Logic
+    const exportMenuBtn = document.getElementById('exportMenuBtn');
+    const exportMenu = document.getElementById('exportMenu');
+
+    // Initial State
+    if (exportMenuBtn) {
+      exportMenuBtn.disabled = true;
+      exportMenuBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+      exportMenuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!exportMenuBtn.disabled) {
+          exportMenu.classList.toggle('hidden');
+        }
+      });
+
+      document.addEventListener('click', (e) => {
+        if (exportMenu && !exportMenu.contains(e.target) && !exportMenuBtn.contains(e.target)) {
+          exportMenu.classList.add('hidden');
+        }
+      });
+    }
+
+    function enableExport() {
+      if (exportMenuBtn) {
+        exportMenuBtn.disabled = false;
+        exportMenuBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+    }
+
+    function disableExport() {
+      if (exportMenuBtn) {
+        exportMenuBtn.disabled = true;
+        exportMenuBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        if (exportMenu) exportMenu.classList.add('hidden');
+      }
+    }
+
+    // Export handlers
+    document.getElementById('exportPNG')?.addEventListener('click', () => {
+      if (lastDiagramResponse && lastDiagramResponse.diagram_png_base64) {
+        downloadBase64AsPNG(lastDiagramResponse.diagram_png_base64);
+      } else {
+        alert('No diagram to export!');
+      }
+    });
+
+    document.getElementById('exportJPG')?.addEventListener('click', () => {
+      if (lastDiagramResponse && lastDiagramResponse.diagram_png_base64) {
+        const img = new Image();
+        img.src = `data:image/png;base64,${lastDiagramResponse.diagram_png_base64}`;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0);
+          const jpgUrl = canvas.toDataURL('image/jpeg', 0.9);
+          const a = document.createElement('a');
+          a.href = jpgUrl;
+          a.download = `nexus-diagram-${Date.now()}.jpg`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        };
+      } else { alert('No diagram to export!'); }
+    });
+
+    document.getElementById('exportSVG')?.addEventListener('click', () => {
+      // Try to use encoded string if available to construct a text file or URL
+      if (lastDiagramResponse && lastDiagramResponse.diagram_source) {
+        alert("SVG export requiring backend support. Use PNG for now.");
+      }
+    });
+
+    document.getElementById('exportPDF')?.addEventListener('click', () => {
+      window.print();
+    });
+
+    // Function to download base64 as PNG
+    function downloadBase64AsPNG(base64Data) {
+      try {
+        // Convert base64 to blob
+        const byteString = atob(base64Data);
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+
+        for (let i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i);
+        }
+
+        const blob = new Blob([ab], { type: 'image/png' });
+        const url = URL.createObjectURL(blob);
+
+        // Create download link
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `nexus-diagram-${new Date().getTime()}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        // Clean up
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+      } catch (error) {
+        console.error('Error downloading base64 PNG:', error);
+        throw error;
+      }
+    }
+
+    // Function to download PNG from PlantUML source
+    async function downloadPNGFromSource(plantumlSource) {
+      try {
+        const response = await fetch('http://127.0.0.1:8002/download-png-from-source', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            diagram_source: plantumlSource
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to generate PNG: ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `nexus-diagram-${new Date().getTime()}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+      } catch (error) {
+        console.error('Error downloading PNG from source:', error);
+        throw error;
+      }
+    }
+
+    // Function to download image from URL
+    function downloadImage(url) {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `nexus-diagram-${new Date().getTime()}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // Render PlantUML diagram (fallback method)
+    async function renderPlantUMLDiagram(plantumlCode, base64Image = null) {
+      const previewCanvas = document.getElementById('previewCanvas');
+
+      try {
+        // Clear any existing content
+        previewCanvas.innerHTML = '';
+
+        // Create a loading indicator
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'h-full w-full flex items-center justify-center text-indigo-500';
+        loadingDiv.innerHTML = `
+        <div class="text-center">
+          <svg class="mx-auto mb-3 spinner" width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z" fill="currentColor" opacity="0.3"/>
+            <path d="M12 2v4c4.411 0 8 3.589 8 8s-3.589 8-8 8v4c5.523 0 10-4.477 10-10S17.523 2 12 2z" fill="currentColor"/>
+          </svg>
+          <div class="text-sm">Rendering diagram...</div>
+        </div>
+      `;
+        previewCanvas.appendChild(loadingDiv);
+
+        // Update PlantUML source
+        document.getElementById('diagramSource').textContent = plantumlCode;
+
+        if (base64Image) {
+          // Use the PNG from backend
+          setTimeout(() => {
+            previewCanvas.innerHTML = '';
+            const img = document.createElement('img');
+            img.src = `data:image/png;base64,${base64Image}`;
+            img.alt = 'PlantUML Diagram';
+            img.className = 'max-w-full h-auto mx-auto';
+            img.style.maxHeight = '400px';
+            img.style.objectFit = 'contain';
+            img.onerror = function () {
+              handleImageError(this, plantumlCode);
+            };
+            previewCanvas.appendChild(img);
+          }, 100);
+        } else {
+          // Try to get encoded URL from backend
+          try {
+            const response = await fetch('http://127.0.0.1:8002/encode-plantuml', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ code: plantumlCode })
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              setTimeout(() => {
+                previewCanvas.innerHTML = '';
+                const img = document.createElement('img');
+                img.src = data.url;
+                img.alt = 'PlantUML Diagram';
+                img.className = 'max-w-full h-auto mx-auto';
+                img.style.maxHeight = '400px';
+                img.style.objectFit = 'contain';
+                img.crossOrigin = 'anonymous';
+                img.onerror = function () {
+                  handleImageError(this, plantumlCode);
+                };
+                previewCanvas.appendChild(img);
+              }, 100);
+            } else {
+              throw new Error('Failed to encode PlantUML');
+            }
+          } catch (e) {
+            console.error('Error encoding PlantUML:', e);
+            showSourceCodeFallback(plantumlCode);
+          }
+        }
+
+      } catch (error) {
+        console.error('PlantUML rendering error:', error);
+        showSourceCodeFallback(plantumlCode);
+      }
+    }
+
+    // Show source code as fallback
+    function showSourceCodeFallback(plantumlCode) {
+      const previewCanvas = document.getElementById('previewCanvas');
+      previewCanvas.innerHTML = `
+      <div class="p-4">
+        <div class="text-center text-yellow-400 mb-4">
+          <svg class="mx-auto mb-2 w-12 h-12" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+          </svg>
+          <p class="font-medium">Diagram Rendering Unavailable</p>
+          <p class="text-sm text-indigo-300 mt-1">Showing source code instead</p>
+        </div>
+        <div class="bg-gray-900 rounded p-3 overflow-auto max-h-80">
+          <pre class="text-xs font-mono text-indigo-300 whitespace-pre-wrap">${escapeHtml(plantumlCode)}</pre>
+        </div>
+        <div class="mt-3 text-xs text-indigo-400">
+          <p>You can view this diagram at:</p>
+          <a href="https://plantuml.com/editor" target="_blank" class="text-indigo-300 hover:text-indigo-200 underline">plantuml.com/editor</a>
+        </div>
+      </div>
+    `;
+    }
+
+    // Handle image loading errors
+    function handleImageError(img, plantumlCode = null) {
+      const container = img.parentElement;
+      const code = plantumlCode || document.getElementById('diagramSource').textContent;
+      showSourceCodeFallback(code);
+    }
+
+    if (document.getElementById('examplesBtn')) {
+      document.getElementById('examplesBtn').addEventListener('click', () => {
+        const examples = [
+          "A social media app where users can post messages, follow other users, and like posts. There should be User, Post, and Feed classes.",
+          "An e-commerce system with Customers, Products, ShoppingCart, and Order. Customers can add products to cart and place orders.",
+          "A library management system with Books, Members, and Loans. Members can borrow books and return them with due dates.",
+          "A banking system with Accounts, Transactions, and Customers. Support for deposits, withdrawals, and balance transfers.",
+          "An online shopping platform where customers can browse products, add to cart, and checkout. Actors: Customer, Admin. (Use Case Diagram)",
+          "A blog system with Users, Posts, and Comments. Users can write posts and leave comments on posts. (ERD)"
+        ];
+
+        const randomExample = examples[Math.floor(Math.random() * examples.length)];
+        if (document.getElementById('projectText')) {
+          document.getElementById('projectText').value = randomExample;
+        }
+
+        // Auto-select diagram type based on example
+        if (randomExample.includes('Sequence Diagram')) {
+          types.forEach(b => b.classList.remove('border-indigo-400', 'ring-1', 'ring-indigo-300'));
+          const btn = document.querySelector('[data-type="sequence"]');
+          if (btn) btn.classList.add('border-indigo-400', 'ring-1', 'ring-indigo-300');
+          currentType = 'sequence';
+        } else if (randomExample.includes('Use Case Diagram')) {
+          types.forEach(b => b.classList.remove('border-indigo-400', 'ring-1', 'ring-indigo-300'));
+          const btn = document.querySelector('[data-type="usecase"]');
+          if (btn) btn.classList.add('border-indigo-400', 'ring-1', 'ring-indigo-300');
+          currentType = 'usecase';
+        } else if (randomExample.includes('ERD')) {
+          types.forEach(b => b.classList.remove('border-indigo-400', 'ring-1', 'ring-indigo-300'));
+          const btn = document.querySelector('[data-type="erd"]');
+          if (btn) btn.classList.add('border-indigo-400', 'ring-1', 'ring-indigo-300');
+          currentType = 'erd';
+        }
+      });
+    }
+
+    if (document.getElementById('clearBtn')) {
+      document.getElementById('clearBtn').addEventListener('click', () => {
+        if (document.getElementById('projectText')) document.getElementById('projectText').value = '';
+        if (document.getElementById('diagramSource')) document.getElementById('diagramSource').textContent = '// generated PlantUML code will appear here';
+        if (document.getElementById('codeOutput')) document.getElementById('codeOutput').textContent = '// generated code will appear here';
+        if (document.getElementById('previewCanvas')) {
+          document.getElementById('previewCanvas').innerHTML = `
+          <div id="placeholder" class="h-full w-full flex items-center justify-center text-indigo-500">
+            <div class="text-center">
+              <svg class="mx-auto mb-3 animate-pulse" width="96" height="96" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 7h4v10H3zM17 7h4v10h-4zM10 5h4v14h-4z" fill="currentColor" opacity="0.2"/></svg>
+              <div class="text-sm">Awaiting generation...</div>
+            </div>
+          </div>
+        `;
+        }
+        lastDiagramResponse = null;
+        disableExport();
+      });
+    }
+
+
+    // Generate Code button functionality (REMOVED)
+
+    if (document.getElementById('downloadBtn')) {
+      document.getElementById('downloadBtn').addEventListener('click', () => {
+        const source = document.getElementById('diagramSource') ? document.getElementById('diagramSource').textContent : '';
+        const code = document.getElementById('codeOutput') ? document.getElementById('codeOutput').textContent : '';
+
+        if (source.includes('// generated PlantUML code')) {
+          alert('Generate a diagram first!');
+          return;
+        }
+
+        const content = `PlantUML Diagram:\n${source}\n\nGenerated Code:\n${code}`;
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `nexus-diagram-${new Date().getTime()}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+    }
+
+    if (document.getElementById('downloadCodeBtn')) {
+      document.getElementById('downloadCodeBtn').addEventListener('click', () => {
+        const code = document.getElementById('codeOutput') ? document.getElementById('codeOutput').textContent : '';
+        const language = document.getElementById('languageSelect') ? document.getElementById('languageSelect').value : 'txt';
+
+        if (code.includes('// generated code will appear here')) {
+          alert('Generate a diagram first!');
+          return;
+        }
+
+        const extension = {
+          'python': 'py', 'javascript': 'js', 'typescript': 'ts', 'java': 'java', 'cpp': 'cpp', 'go': 'go', 'rust': 'rs', 'csharp': 'cs', 'php': 'php', 'ruby': 'rb'
+        }[language] || 'txt';
+
+        const blob = new Blob([code], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `generated-code-${new Date().getTime()}.${extension}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+    }
+
+    if (document.getElementById('copyCode')) {
+      document.getElementById('copyCode').addEventListener('click', () => {
+        const code = document.getElementById('codeOutput') ? document.getElementById('codeOutput').innerText : '';
+        if (code.includes('// generated code will appear here')) {
+          alert('Generate a diagram first!');
+          return;
+        }
+
+        navigator.clipboard.writeText(code).then(() => {
+          const btn = document.getElementById('copyCode');
+          const originalText = btn.textContent;
+          btn.textContent = 'Copied!';
+          btn.classList.add('bg-green-600');
+          setTimeout(() => {
+            btn.textContent = originalText;
+            btn.classList.remove('bg-green-600');
+          }, 2000);
+        }).catch(err => {
+          console.error('Failed to copy: ', err);
+          alert('Failed to copy code to clipboard');
+        });
+      });
+    }
+
+
+    // Mock data generator (for testing)
+    function generateMockDiagram(text, type) {
+      // ... keep your existing mock diagram functions ...
+      return {
+        plantuml: `@startuml
+!theme plain
+skinparam class {
+  BackgroundColor #f0fdfa
+  BorderColor #2dd4bf
+  ArrowColor #f43f5e
+  FontColor #134e4a
+  ActorBackgroundColor #99f6e4
+  ActorBorderColor #0d9488
+}
+
+class MockClass {
+  -id: int
+  -name: string
+  +save(): void
+  +delete(): void
+}
+
+@enduml`,
+        code: `# Mock Python code
+class MockClass:
+    def __init__(self, id: int, name: str):
+        self.id = id
+        self.name = name
+    
+    def save(self):
+        print(f"Saving {self.name}")
+    
+    def delete(self):
+        print(f"Deleting {self.name}")`
+      };
+    }
+
+    // Mock code generator for code mode
+    function generateMockCode(description, language, codeType) {
+      // ... keep your existing mock code function ...
+      return `# Mock ${language} code
+# Description: ${description.substring(0, 100)}...
+
+print("Mock code generated")`;
+    }
+
+    function escapeHtml(s) {
+      return s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+    }
+
+    // On Load: Recover model from localStorage if it exists
+    window.addEventListener('load', () => {
+      const saved = localStorage.getItem('nexus_current_model');
+      if (saved) {
+        try {
+          const parsedModel = JSON.parse(saved);
+          currentDiagramModel = cleanOrphanedRelationships(parsedModel);
+          console.log('Recovered model from session');
+          // If we are already in interactive mode, load it
+          if (currentMode === 'interactive') {
+            enterNativeMode();
+          }
+        } catch (e) {
+          console.error('Failed to recover model', e);
+        }
+      }
+    });
+  </script>
+
+  <script src="theme-toggle.js"></script>
+</body>
+
+</html>
