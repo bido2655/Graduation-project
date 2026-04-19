@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS PRO - Visual Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="theme.css">
+    <style>
+        :root {
+            --bg-deep: #050508;
+            --bg-dark: #0a0a0f;
+            --bg-panel: #11111a;
+            --accent-primary: #6366f1;
+            --accent-secondary: #4f46e5;
+            --text-main: #e2e8f0;
+            --text-dim: #94a3b8;
+            --border-color: #1e1e2d;
+            --grid-size: 20px;
+            /* Dark mode extra vars */
+            --node-bg: #1e1e2d;
+            --node-border: #3f3f5a;
+            --node-shadow: rgba(0, 0, 0, 0.5);
+            --node-header-bg: rgba(99, 102, 241, 0.15);
+            --node-header-border: rgba(255, 255, 255, 0.05);
+            --input-bg: rgba(0, 0, 0, 0.5);
+            --input-border: rgba(255, 255, 255, 0.1);
+            --glass-bg: rgba(17, 17, 26, 0.8);
+            --shape-thumb-bg: rgba(255, 255, 255, 0.03);
+            --shape-hover-bg: rgba(99, 102, 241, 0.1);
+            --grid-line: rgba(255, 255, 255, 0.05);
+            --scrollbar-thumb: #2a2a3d;
+            --scrollbar-hover: #3f3f5a;
+            --arrow-label-color: #e2e8f0;
+            --arrow-label-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+            --divider-bg: rgba(255, 255, 255, 0.1);
+            --hover-overlay: rgba(255, 255, 255, 0.05);
+            --ctx-menu-bg: rgba(15, 15, 24, 0.95);
+            --ctx-menu-border: rgba(99, 102, 241, 0.4);
+            --multi-opt-bg: rgba(0, 0, 0, 0.4);
+            --modal-overlay: rgba(0, 0, 0, 0.8);
+            --modal-bg: var(--bg-panel);
+            --inherit-marker-fill: #050508;
+            --sidebar-header-bg: rgba(0, 0, 0, 0.3);
+            --footer-bg: rgba(0, 0, 0, 0.2);
+        }
+
+        /* ==================== LIGHT MODE ==================== */
+        body.light-mode {
+            --bg-deep: #f0f2f5;
+            --bg-dark: #e8eaed;
+            --bg-panel: #ffffff;
+            --accent-primary: #4f46e5;
+            --accent-secondary: #4338ca;
+            --text-main: #1e293b;
+            --text-dim: #64748b;
+            --border-color: #e2e8f0;
+            --node-bg: #ffffff;
+            --node-border: #cbd5e1;
+            --node-shadow: rgba(0, 0, 0, 0.08);
+            --node-header-bg: rgba(79, 70, 229, 0.1);
+            --node-header-border: rgba(0, 0, 0, 0.06);
+            --input-bg: #f8fafc;
+            --input-border: #cbd5e1;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --shape-thumb-bg: rgba(0, 0, 0, 0.02);
+            --shape-hover-bg: rgba(79, 70, 229, 0.08);
+            --grid-line: rgba(0, 0, 0, 0.06);
+            --scrollbar-thumb: #cbd5e1;
+            --scrollbar-hover: #94a3b8;
+            --arrow-label-color: #1e293b;
+            --arrow-label-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+            --divider-bg: rgba(0, 0, 0, 0.08);
+            --hover-overlay: rgba(0, 0, 0, 0.04);
+            --ctx-menu-bg: rgba(255, 255, 255, 0.97);
+            --ctx-menu-border: rgba(79, 70, 229, 0.3);
+            --multi-opt-bg: #f1f5f9;
+            --modal-overlay: rgba(0, 0, 0, 0.4);
+            --modal-bg: #ffffff;
+            --inherit-marker-fill: #ffffff;
+            --sidebar-header-bg: rgba(0, 0, 0, 0.03);
+            --footer-bg: rgba(0, 0, 0, 0.02);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            overflow: hidden;
+            height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .heading-font {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* ===== Theme Toggle Button ===== */
+        .theme-toggle-btn {
+            position: relative;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid var(--input-border);
+            background: var(--hover-overlay);
+            color: var(--text-dim);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+
+        .theme-toggle-btn:hover {
+            color: var(--text-main);
+            background: var(--shape-hover-bg);
+            border-color: var(--accent-primary);
+        }
+
+        .theme-toggle-btn .icon-sun,
+        .theme-toggle-btn .icon-moon {
+            transition: opacity 0.25s, transform 0.25s;
+            position: absolute;
+        }
+
+        .theme-toggle-btn .icon-sun {
+            opacity: 0;
+            transform: rotate(-90deg) scale(0.6);
+        }
+
+        .theme-toggle-btn .icon-moon {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+
+        body.light-mode .theme-toggle-btn .icon-sun {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+
+        body.light-mode .theme-toggle-btn .icon-moon {
+            opacity: 0;
+            transform: rotate(90deg) scale(0.6);
+        }
+
+        /* Canvas Styles */
+        #canvas-container {
+            position: relative;
+            flex-grow: 1;
+            overflow: hidden;
+            background-color: var(--bg-deep);
+            background-image:
+                linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+            background-size: var(--grid-size) var(--grid-size);
+            cursor: crosshair;
+            transition: background-color 0.3s;
+            user-select: none;
+        }
+
+        #canvas-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 10000px;
+            height: 10000px;
+            transform-origin: 0 0;
+        }
+
+        /* Sidebar Styles */
+        .sidebar-panel {
+            width: 260px;
+            background-color: var(--bg-panel);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .property-panel {
+            width: 300px;
+            background-color: var(--bg-panel);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        /* Accordion */
+        .accordion-item {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .accordion-header {
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            transition: color 0.2s;
+        }
+
+        .accordion-header:hover {
+            color: var(--text-main);
+        }
+
+        .accordion-content {
+            padding: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        /* Draggable Shape Thumbnails */
+        .shape-thumb {
+            width: calc(50% - 4px);
+            aspect-ratio: 1;
+            background: var(--shape-thumb-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            transition: all 0.2s;
+            padding: 8px;
+        }
+
+        .shape-thumb:hover {
+            background: var(--shape-hover-bg);
+            border-color: var(--accent-primary);
+        }
+
+        .shape-thumb svg {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 4px;
+        }
+
+        .shape-thumb span {
+            font-size: 10px;
+            color: var(--text-dim);
+        }
+
+        /* Node Styles */
+        .editor-node {
+            position: absolute;
+            background-color: var(--node-bg);
+            border: 2px solid var(--node-border);
+            border-radius: 6px;
+            box-shadow: 0 10px 25px var(--node-shadow);
+            z-index: 10;
+            transition: background-color 0.3s, border-color 0.3s;
+            user-select: none;
+        }
+
+        .editor-node.selected {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+        }
+
+        .node-header {
+            padding: 8px 12px;
+            background: var(--node-header-bg);
+            border-bottom: 1px solid var(--node-header-border);
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-align: center;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+            cursor: move;
+        }
+
+        .node-body {
+            padding: 8px 12px;
+            font-size: 0.75rem;
+        }
+
+        .draggable-shape {
+            cursor: grab !important;
+        }
+
+        .draggable-shape:active {
+            cursor: grabbing !important;
+        }
+
+        /* Resize Handles */
+        .node-resize-handle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: var(--accent-primary);
+            border: 1px solid white;
+            border-radius: 2px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 20;
+        }
+
+        .editor-node:hover .node-resize-handle,
+        .editor-node.selected .node-resize-handle {
+            opacity: 0.6;
+        }
+
+        .node-resize-handle:hover {
+            opacity: 1 !important;
+            transform: scale(1.2);
+        }
+
+        .handle-tl {
+            top: -5px;
+            left: -5px;
+            cursor: nw-resize;
+        }
+
+        .handle-tr {
+            top: -5px;
+            right: -5px;
+            cursor: ne-resize;
+        }
+
+        .handle-bl {
+            bottom: -5px;
+            left: -5px;
+            cursor: sw-resize;
+        }
+
+        .handle-br {
+            bottom: -5px;
+            right: -5px;
+            cursor: se-resize;
+        }
+
+        .handle-t {
+            top: -5px;
+            left: calc(50% - 5px);
+            cursor: n-resize;
+        }
+
+        .handle-b {
+            bottom: -5px;
+            left: calc(50% - 5px);
+            cursor: s-resize;
+        }
+
+        .handle-l {
+            left: -5px;
+            top: calc(50% - 5px);
+            cursor: w-resize;
+        }
+
+        .handle-r {
+            right: -5px;
+            top: calc(50% - 5px);
+            cursor: e-resize;
+        }
+
+        /* Connection Arrows (Arrow Makers) */
+        .conn-handle {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: crosshair;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 50;
+            color: var(--accent-primary);
+        }
+
+        /* Only show when selected */
+        .editor-node.selected .conn-handle {
+            opacity: 0.4;
+            pointer-events: all;
+        }
+
+        .conn-handle:hover {
+            opacity: 1 !important;
+            transform: scale(1.4) !important;
+            color: white;
+            filter: drop-shadow(0 0 5px var(--accent-primary));
+        }
+
+        /* Positions sitting clearly OUTSIDE the node */
+        .handle-top {
+            top: -30px;
+            left: calc(50% - 11px);
+            transform: translateY(0) rotate(-90deg);
+        }
+
+        .handle-bottom {
+            bottom: -30px;
+            left: calc(50% - 11px);
+            transform: translateY(0) rotate(90deg);
+        }
+
+        .handle-left {
+            left: -30px;
+            top: calc(50% - 11px);
+            transform: translateX(0) rotate(180deg);
+        }
+
+        .handle-right {
+            right: -30px;
+            top: calc(50% - 11px);
+            transform: translateX(0) rotate(0deg);
+        }
+
+        /* Animation pops further out on node hover */
+        .editor-node:hover .handle-top {
+            transform: translateY(-5px) rotate(-90deg);
+        }
+
+        .editor-node:hover .handle-bottom {
+            transform: translateY(5px) rotate(90deg);
+        }
+
+        .editor-node:hover .handle-left {
+            transform: translateX(-5px) rotate(180deg);
+        }
+
+        .editor-node:hover .handle-right {
+            transform: translateX(5px) rotate(0deg);
+        }
+
+        .conn-handle svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 2px rgba(99, 102, 241, 0.5));
+        }
+
+        /* SVG Overlays */
+        #connections-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 10000px;
+            height: 10000px;
+            pointer-events: none;
+            z-index: 5;
+            overflow: visible;
+        }
+
+        #connections-layer * {
+            pointer-events: all;
+        }
+
+        .connector-tool.active {
+            border-color: var(--accent-primary) !important;
+            background: rgba(99, 102, 241, 0.2);
+            color: white;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-panel);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--scrollbar-hover);
+        }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(8px);
+        }
+
+        /* Standalone Arrow Styles */
+        .editor-node.arrow-node {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            border-radius: 0;
+            min-width: unset;
+            overflow: visible;
+        }
+
+        .editor-node.arrow-node.selected {
+            border: none;
+            box-shadow: none;
+        }
+
+        .editor-node.arrow-node.selected::after {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border: 2px dashed var(--accent-primary);
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        .arrow-label-text {
+            position: absolute;
+            top: -22px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--arrow-label-color);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            pointer-events: none;
+            text-shadow: var(--arrow-label-shadow);
+        }
+
+        /* ===== Light mode overrides for Tailwind utility classes ===== */
+        body.light-mode .bg-black {
+            background-color: var(--bg-deep) !important;
+        }
+
+        body.light-mode .bg-black\/40,
+        body.light-mode .bg-black\/50,
+        body.light-mode .bg-black\/30 {
+            background-color: var(--input-bg) !important;
+        }
+
+        body.light-mode .bg-gray-900\/50,
+        body.light-mode .bg-gray-900\/30 {
+            background-color: var(--sidebar-header-bg) !important;
+        }
+
+        body.light-mode .bg-indigo-950\/20 {
+            background-color: rgba(79, 70, 229, 0.05) !important;
+        }
+
+        body.light-mode .border-white\/10,
+        body.light-mode .border-white\/5 {
+            border-color: var(--border-color) !important;
+        }
+
+        body.light-mode .border-indigo-900\/30,
+        body.light-mode .border-indigo-900\/40 {
+            border-color: var(--border-color) !important;
+        }
+
+        body.light-mode .bg-white\/5 {
+            background-color: rgba(0, 0, 0, 0.04) !important;
+        }
+
+        body.light-mode .hover\:bg-white\/5:hover {
+            background-color: rgba(0, 0, 0, 0.06) !important;
+        }
+
+        body.light-mode .text-dim {
+            color: var(--text-dim) !important;
+        }
+
+        body.light-mode .hover\:text-white:hover {
+            color: var(--text-main) !important;
+        }
+
+        body.light-mode .text-white {
+            color: var(--text-main) !important;
+        }
+
+        body.light-mode .bg-white\/10,
+        body.light-mode .w-px.bg-white\/10,
+        body.light-mode .h-6.w-px.bg-white\/10 {
+            background-color: var(--divider-bg) !important;
+        }
+
+        /* Buttons: keep colored buttons readable */
+        body.light-mode .bg-indigo-600 {
+            background-color: #4f46e5 !important;
+        }
+
+        body.light-mode .bg-indigo-600 .text-white,
+        body.light-mode .bg-emerald-600 .text-white,
+        body.light-mode .bg-indigo-600\/20 {
+            color: inherit;
+        }
+
+        body.light-mode .bg-emerald-600 {
+            background-color: #059669 !important;
+        }
+
+        body.light-mode .bg-emerald-600 *,
+        body.light-mode .bg-indigo-600 * {
+            color: #ffffff !important;
+        }
+
+        body.light-mode .bg-indigo-600\/20 {
+            background-color: rgba(79, 70, 229, 0.1) !important;
+        }
+
+        body.light-mode .bg-indigo-600\/20 * {
+            color: #4338ca !important;
+        }
+
+        body.light-mode .border-indigo-500\/50 {
+            border-color: rgba(79, 70, 229, 0.3) !important;
+        }
+
+        body.light-mode .text-indigo-200 {
+            color: #4338ca !important;
+        }
+
+        body.light-mode .text-indigo-400 {
+            color: #4f46e5 !important;
+        }
+
+        body.light-mode .text-indigo-300 {
+            color: #4f46e5 !important;
+        }
+
+        body.light-mode .shadow-indigo-500\/20 {
+            box-shadow: 0 10px 15px rgba(79, 70, 229, 0.12) !important;
+        }
+
+        body.light-mode .shadow-emerald-500\/20 {
+            box-shadow: 0 10px 15px rgba(5, 150, 105, 0.12) !important;
+        }
+
+        /* Inputs in light mode */
+        body.light-mode input[type="text"],
+        body.light-mode input[type="number"],
+        body.light-mode textarea,
+        body.light-mode select {
+            background-color: var(--input-bg) !important;
+            border-color: var(--input-border) !important;
+            color: var(--text-main) !important;
+        }
+
+        body.light-mode input[type="text"]::placeholder,
+        body.light-mode textarea::placeholder {
+            color: var(--text-dim) !important;
+        }
+
+        body.light-mode select option {
+            background-color: var(--bg-panel);
+            color: var(--text-main);
+        }
+
+        /* Range inputs in light mode */
+        body.light-mode input[type="range"] {
+            background-color: var(--border-color) !important;
+        }
+
+        /* Delete / red buttons in light mode */
+        body.light-mode .bg-red-900\/20 {
+            background-color: rgba(220, 38, 38, 0.06) !important;
+        }
+
+        body.light-mode .hover\:bg-red-900\/40:hover {
+            background-color: rgba(220, 38, 38, 0.12) !important;
+        }
+
+        body.light-mode .border-red-900\/50 {
+            border-color: rgba(220, 38, 38, 0.2) !important;
+        }
+
+        body.light-mode .text-red-200 {
+            color: #dc2626 !important;
+        }
+
+        body.light-mode .text-red-400 {
+            color: #dc2626 !important;
+        }
+
+        body.light-mode .hover\:text-red-300:hover {
+            color: #b91c1c !important;
+        }
+
+        body.light-mode .bg-red-600\/10 {
+            background-color: rgba(220, 38, 38, 0.06) !important;
+        }
+
+        body.light-mode .hover\:bg-red-600\/20:hover {
+            background-color: rgba(220, 38, 38, 0.12) !important;
+        }
+
+        body.light-mode .border-red-500\/30 {
+            border-color: rgba(220, 38, 38, 0.2) !important;
+        }
+
+        body.light-mode .text-red-100 {
+            color: #dc2626 !important;
+        }
+
+        /* Gradient text keeps working in light mode */
+        body.light-mode .from-indigo-400 {
+            --tw-gradient-from: #4f46e5 !important;
+        }
+
+        body.light-mode .to-purple-400 {
+            --tw-gradient-to: #7c3aed !important;
+        }
+
+        /* Context menu / floating relationship editor */
+        body.light-mode #rel-context-menu {
+            background: var(--ctx-menu-bg) !important;
+            border-color: var(--ctx-menu-border) !important;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12) !important;
+        }
+
+        body.light-mode .multi-opt,
+        body.light-mode .anchor-opt {
+            background-color: var(--multi-opt-bg) !important;
+            border-color: var(--border-color) !important;
+            color: var(--text-main) !important;
+        }
+
+        body.light-mode .multi-opt:hover {
+            background-color: rgba(79, 70, 229, 0.1) !important;
+        }
+
+        body.light-mode .hover\:bg-indigo-600\/20:hover {
+            background-color: rgba(79, 70, 229, 0.1) !important;
+        }
+
+        body.light-mode .hover\:bg-red-600\/20:hover {
+            background-color: rgba(220, 38, 38, 0.1) !important;
+        }
+
+        body.light-mode .hover\:bg-indigo-600\/10:hover {
+            background-color: rgba(79, 70, 229, 0.08) !important;
+        }
+
+        /* Rel type options in light mode */
+        body.light-mode .rel-type-opt {
+            border-color: var(--border-color) !important;
+        }
+
+        body.light-mode .rel-type-opt:hover {
+            background-color: rgba(79, 70, 229, 0.06) !important;
+        }
+
+        /* Modal in light mode */
+        body.light-mode #exportModal>div:first-child {
+            background: var(--modal-overlay) !important;
+        }
+
+        body.light-mode .bg-panel {
+            background-color: var(--modal-bg) !important;
+        }
+
+        body.light-mode #exportModal .border-indigo-500\/30 {
+            border-color: var(--border-color) !important;
+        }
+
+        /* Floating Nav Controls in light mode */
+        body.light-mode .bg-indigo-600\/20 {
+            background-color: rgba(79, 70, 229, 0.1) !important;
+        }
+
+        /* Footer in light mode */
+        body.light-mode footer {
+            background-color: var(--footer-bg) !important;
+        }
+
+        /* Animate-pulse dot */
+        body.light-mode .animate-pulse {
+            opacity: 0.8;
+        }
+
+        /* Conn handle hover color in light mode */
+        body.light-mode .conn-handle:hover {
+            color: var(--accent-primary);
+        }
+        /* Anchor Selection Buttons */
+        .anchor-opt {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--multi-opt-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-dim);
+        }
+
+        .anchor-opt:hover {
+            border-color: var(--accent-primary);
+            color: var(--text-main);
+        }
+
+        .anchor-opt.active {
+            background: var(--accent-primary) !important;
+            border-color: var(--accent-primary) !important;
+            color: white !important;
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+        }
+    </style>
+</head>
+
+<body class="flex flex-col h-screen overflow-hidden">
+
+    <!-- Top Toolbar -->
+    <nav class="h-14 glass border-b border-indigo-900/30 flex items-center justify-between px-6 z-50">
+        <div class="flex items-center gap-4">
+            <h1
+                class="heading-font text-xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                NEXUS PRO EDITOR</h1>
+            <div class="h-6 w-px bg-white/10 mx-2"></div>
+            <div class="flex items-center gap-2">
+                <button id="undoBtn" class="p-2 hover:bg-white/5 rounded text-dim hover:text-white transition-colors"
+                    title="Undo (Ctrl+Z)">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                    </svg>
+                </button>
+                <button id="redoBtn" class="p-2 hover:bg-white/5 rounded text-dim hover:text-white transition-colors"
+                    title="Redo (Ctrl+Y)">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 10h-10a8 8 0 00-8 8v2m18-10l-6 6m6-6l-6-6" />
+                    </svg>
+                </button>
+                <div class="h-6 w-px bg-white/10 mx-1"></div>
+                <button id="zoomOut"
+                    class="p-2 hover:bg-white/5 rounded text-dim hover:text-white transition-colors"><svg
+                        class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+                    </svg></button>
+                <span id="zoomLevel" class="text-xs font-mono text-indigo-400 min-w-12 text-center">100%</span>
+                <button id="zoomIn"
+                    class="p-2 hover:bg-white/5 rounded text-dim hover:text-white transition-colors"><svg
+                        class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg></button>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <button id="exportBtn"
+                class="px-4 py-2 bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/50 text-indigo-200 rounded text-sm font-medium transition-all group hidden">
+                <span class="flex items-center gap-2 tracking-wide">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    EXPORT TO MAIN
+                </span>
+            </button>
+            <button id="themeToggleBtn"
+                class="editor-theme-btn p-2 hover:bg-white/5 rounded text-dim hover:text-white transition-colors relative w-9 h-9 flex items-center justify-center text-indigo-200"
+                title="Toggle Light/Dark Mode">
+                <svg class="icon-sun w-5 h-5 absolute" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                <svg class="icon-moon w-5 h-5 absolute" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+            </button>
+            <button id="saveToMainBtn"
+                class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 border border-emerald-400/50 text-white rounded text-sm font-semibold shadow-lg shadow-emerald-500/20 transition-all uppercase tracking-wider flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                </svg>
+                Save to Main
+            </button>
+            <button id="renderBtn"
+                class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-sm font-semibold shadow-lg shadow-indigo-500/20 transition-all btn-glow uppercase tracking-wider">
+                Download PNG
+            </button>
+        </div>
+    </nav>
+
+    <div class="flex flex-1 overflow-hidden">
+
+        <!-- Left Sidebar: Shapes Library -->
+        <aside class="sidebar-panel h-full">
+            <div class="p-4 border-b border-indigo-900/30 bg-gray-900/50">
+                <div class="relative">
+                    <input type="text" placeholder="Search shapes..."
+                        class="w-full bg-black/40 border border-white/10 rounded-md py-2 px-3 text-xs focus:ring-1 focus:ring-indigo-500 outline-none transition-all">
+                    <svg class="absolute right-3 top-2.5 w-3.5 h-3.5 text-dim" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="overflow-y-auto flex-1 custom-scroll">
+                <!-- General Section -->
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>GENERAL</span>
+                        <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="shape-thumb draggable-shape" data-type="class">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="2" y="4" width="20" height="16" rx="1" />
+                                <path d="M2 10h20" />
+                            </svg>
+                            <span>Class</span>
+                        </div>
+                        <div class="shape-thumb draggable-shape" data-type="interface">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="2" y="4" width="20" height="16" rx="1" stroke-dasharray="3 3" />
+                                <path d="M2 10h20" />
+                            </svg>
+                            <span>Interface</span>
+                        </div>
+                        <div class="shape-thumb draggable-shape" data-type="note">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M3 3h18v12l-6 6H3V3z" />
+                                <path d="M15 21v-6h6" />
+                            </svg>
+                            <span>Note</span>
+                        </div>
+                        <div class="shape-thumb draggable-shape" data-type="actor">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="12" cy="7" r="4" />
+                                <path d="M5 21v-2a7 7 0 0114 0v2" />
+                                <path d="M12 11v10M8 15h8" />
+                            </svg>
+                            <span>Actor</span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- UML Section -->
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>USE CASE DIAGRAM</span>
+                        <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="shape-thumb draggable-shape" data-type="actor">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="12" cy="7" r="4" />
+                                <path d="M5 21v-2a7 7 0 0114 0v2" />
+                                <path d="M12 11v10M8 15h8" />
+                            </svg>
+                            <span>Actor</span>
+                        </div>
+                        <div class="shape-thumb draggable-shape" data-type="usecase">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <ellipse cx="12" cy="12" rx="10" ry="6" />
+                            </svg>
+                            <span>Use Case</span>
+                        </div>
+                        <div class="shape-thumb draggable-shape" data-type="system">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="2" y="2" width="20" height="20" rx="2" />
+                            </svg>
+                            <span>Boundary</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ERD Section -->
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>ENTITY RELATION (ERD)</span>
+                        <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="shape-thumb draggable-shape" data-type="table">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="2" y="4" width="20" height="16" />
+                                <path d="M2 10h20M8 10v10" />
+                            </svg>
+                            <span>Table</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sequence Diagram Section -->
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>SEQUENCE DIAGRAM</span>
+                        <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="shape-thumb draggable-shape" data-type="participant">
+                            <svg viewBox="0 0 32 40" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="4" y="2" width="24" height="12" rx="2" fill="rgba(99,102,241,0.15)" />
+                                <text x="16" y="10" text-anchor="middle" fill="currentColor" font-size="6"
+                                    stroke="none">Name</text>
+                                <line x1="16" y1="14" x2="16" y2="38" stroke-dasharray="3 2" />
+                            </svg>
+                            <span>Participant</span>
+                        </div>
+                        <div class="shape-thumb draggable-shape" data-type="database">
+                            <svg viewBox="0 0 32 40" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <ellipse cx="16" cy="5" rx="10" ry="3" fill="rgba(99,102,241,0.15)" />
+                                <line x1="6" y1="5" x2="6" y2="17" />
+                                <line x1="26" y1="5" x2="26" y2="17" />
+                                <ellipse cx="16" cy="17" rx="10" ry="3" fill="rgba(99,102,241,0.15)" />
+                                <line x1="16" y1="20" x2="16" y2="38" stroke-dasharray="3 2" />
+                            </svg>
+                            <span>Database</span>
+                        </div>
+                        <div class="shape-thumb draggable-shape" data-type="boundary">
+                            <svg viewBox="0 0 32 40" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <line x1="6" y1="3" x2="6" y2="17" />
+                                <line x1="6" y1="10" x2="11" y2="10" />
+                                <circle cx="19" cy="10" r="8" />
+                                <line x1="16" y1="18" x2="16" y2="38" stroke-dasharray="3 2" />
+                            </svg>
+                            <span>Boundary</span>
+                        </div>
+                        <div class="shape-thumb draggable-shape" data-type="control">
+                            <svg viewBox="0 0 32 40" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="16" cy="12" r="8" />
+                                <path d="M13 2 L16 5 L19 2" stroke-width="1.5" />
+                                <line x1="16" y1="20" x2="16" y2="38" stroke-dasharray="3 2" />
+                            </svg>
+                            <span>Control</span>
+                        </div>
+                        <div class="shape-thumb draggable-shape" data-type="entity">
+                            <svg viewBox="0 0 32 40" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="16" cy="10" r="8" />
+                                <line x1="8" y1="19" x2="24" y2="19" stroke-width="2" />
+                                <line x1="16" y1="19" x2="16" y2="38" stroke-dasharray="3 2" />
+                            </svg>
+                            <span>Entity</span>
+                        </div>
+                        <div class="shape-thumb draggable-shape" data-type="alt">
+                            <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="2" y="4" width="28" height="24" rx="1" fill="rgba(99,102,241,0.05)" />
+                                <path d="M2 4 L10 4 L12 8 L2 8 Z" fill="rgba(99,102,241,0.2)" />
+                                <text x="4" y="7" fill="currentColor" font-size="3" stroke="none" font-weight="bold">alt</text>
+                            </svg>
+                            <span>Alt Fragment</span>
+                        </div>
+                        <div class="shape-thumb draggable-shape" data-type="loop">
+                            <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="2" y="4" width="28" height="24" rx="1" fill="rgba(99,102,241,0.05)" />
+                                <path d="M2 4 L11 4 L13 8 L2 8 Z" fill="rgba(99,102,241,0.2)" />
+                                <text x="4" y="7" fill="currentColor" font-size="3" stroke="none" font-weight="bold">loop</text>
+                            </svg>
+                            <span>Loop Fragment</span>
+                        </div>
+                        <div class="shape-thumb draggable-shape" data-type="activation">
+                            <svg viewBox="0 0 32 40" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <line x1="16" y1="2" x2="16" y2="38" stroke-dasharray="3 2" />
+                                <rect x="13" y="10" width="6" height="20" fill="rgba(255,255,255,0.9)" stroke="currentColor" />
+                            </svg>
+                            <span>Activation</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BPMN Section -->
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>BPMN</span>
+                        <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="shape-thumb draggable-shape" data-type="bpmn-task">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="2" y="4" width="20" height="16" rx="3" />
+                            </svg>
+                            <span>Task</span>
+                        </div>
+                        <div class="shape-thumb draggable-shape" data-type="bpmn-gateway">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M12 2 L22 12 L12 22 L2 12 Z" />
+                                <path d="M12 7 L12 17 M7 12 L17 12" stroke-width="1" />
+                            </svg>
+                            <span>Gateway</span>
+                        </div>
+                        <div class="shape-thumb draggable-shape" data-type="bpmn-start">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="12" cy="12" r="8" />
+                            </svg>
+                            <span>Start</span>
+                        </div>
+                        <div class="shape-thumb draggable-shape" data-type="bpmn-end">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <circle cx="12" cy="12" r="8" />
+                            </svg>
+                            <span>End</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity Diagram Section -->
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>ACTIVITY DIAGRAM</span>
+                        <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="shape-thumb draggable-shape" data-type="activity-action">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="2" y="6" width="20" height="12" rx="6" />
+                            </svg>
+                            <span>Action</span>
+                        </div>
+                        <div class="shape-thumb draggable-shape" data-type="activity-decision">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M12 4 L20 12 L12 20 L4 12 Z" />
+                            </svg>
+                            <span>Decision</span>
+                        </div>
+                        <div class="shape-thumb draggable-shape" data-type="activity-initial">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <circle cx="12" cy="12" r="6" />
+                            </svg>
+                            <span>Initial</span>
+                        </div>
+                        <div class="shape-thumb draggable-shape" data-type="activity-final">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="12" cy="12" r="8" />
+                                <circle cx="12" cy="12" r="5" fill="currentColor" />
+                            </svg>
+                            <span>Final</span>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="flex-1 relative bg-black overflow-hidden flex flex-col">
+            <div id="canvas-container">
+                <div id="canvas-content">
+                    <svg id="connections-layer">
+                        <defs>
+                            <marker id="arrow-assoc" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+                                <path d="M0,0 L10,5 L0,10" fill="none" stroke="#4f46e5" stroke-width="2" />
+                            </marker>
+                            <marker id="arrow-inherit" markerWidth="12" markerHeight="12" refX="11" refY="6"
+                                orient="auto">
+                                <path d="M0,0 L12,6 L0,12 z" fill="#050508" stroke="#4f46e5" stroke-width="1.5" />
+                            </marker>
+                            <marker id="arrow-aggregation" markerWidth="14" markerHeight="14" refX="13" refY="7"
+                                orient="auto">
+                                <path d="M1,7 L7,1 L13,7 L7,13 z" fill="#050508" stroke="#4f46e5" stroke-width="1.5" />
+                            </marker>
+                            <marker id="arrow-composition" markerWidth="14" markerHeight="14" refX="13" refY="7"
+                                orient="auto">
+                                <path d="M1,7 L7,1 L13,7 L7,13 z" fill="#4f46e5" stroke="#4f46e5" stroke-width="1.5" />
+                            </marker>
+                            <marker id="arrow-dependency" markerWidth="10" markerHeight="10" refX="9" refY="5"
+                                orient="auto">
+                                <path d="M0,0 L10,5 L0,10" fill="none" stroke="#4f46e5" stroke-width="2" />
+                            </marker>
+
+                            <!-- Selected Markers -->
+                            <marker id="arrow-assoc-selected" markerWidth="10" markerHeight="10" refX="9" refY="5"
+                                orient="auto">
+                                <path d="M0,0 L10,5 L0,10" fill="none" stroke="#818cf8" stroke-width="2.5" />
+                            </marker>
+                            <marker id="arrow-inherit-selected" markerWidth="12" markerHeight="12" refX="11" refY="6"
+                                orient="auto">
+                                <path d="M0,0 L12,6 L0,12 z" fill="#050508" stroke="#818cf8" stroke-width="2" />
+                            </marker>
+                            <marker id="arrow-aggregation-selected" markerWidth="14" markerHeight="14" refX="13"
+                                refY="7" orient="auto">
+                                <path d="M1,7 L7,1 L13,7 L7,13 z" fill="#050508" stroke="#818cf8" stroke-width="2" />
+                            </marker>
+                            <marker id="arrow-composition-selected" markerWidth="14" markerHeight="14" refX="13"
+                                refY="7" orient="auto">
+                                <path d="M1,7 L7,1 L13,7 L7,13 z" fill="#818cf8" stroke="#818cf8" stroke-width="2" />
+                            </marker>
+                            <marker id="arrow-dependency-selected" markerWidth="10" markerHeight="10" refX="9" refY="5"
+                                orient="auto">
+                                <path d="M0,0 L10,5 L0,10" fill="none" stroke="#818cf8" stroke-width="2.5" />
+                            </marker>
+
+                            <!-- Sequence Diagram Markers (filled, refX at tip for zero gap) -->
+                            <marker id="arrow-seq" markerWidth="12" markerHeight="8" refX="12" refY="4" orient="auto">
+                                <path d="M0,0 L12,4 L0,8 z" fill="#4f46e5" stroke="none" />
+                            </marker>
+                            <marker id="arrow-seq-selected" markerWidth="12" markerHeight="8" refX="12" refY="4"
+                                orient="auto">
+                                <path d="M0,0 L12,4 L0,8 z" fill="#818cf8" stroke="none" />
+                            </marker>
+                        </defs>
+                    </svg>
+                    <!-- Nodes will be injected here -->
+                </div>
+            </div>
+
+            <!-- Floating Navigation Controls -->
+            <div class="absolute bottom-6 left-6 flex gap-2 z-40">
+                <div class="glass border border-white/10 flex rounded-lg shadow-2xl p-1">
+                    <button id="panMode"
+                        class="p-2 hover:bg-white/5 rounded text-dim hover:text-white transition-colors"
+                        title="Pan (Space)">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                        </svg>
+                    </button>
+                    <button id="selectMode" class="p-2 bg-indigo-600/20 text-indigo-400 rounded transition-colors"
+                        title="Select (V)">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5" />
+                        </svg>
+                    </button>
+                    <div class="w-px bg-white/10 mx-1"></div>
+                    <button id="fitView"
+                        class="p-2 hover:bg-white/5 rounded text-dim hover:text-white transition-colors"
+                        title="Fit to View">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Side: Properties Panel -->
+        <aside class="property-panel h-full glass border-l border-indigo-900/40">
+            <header class="p-5 border-b border-indigo-900/30 flex justify-between items-center bg-indigo-950/20">
+                <h2 class="text-sm font-bold tracking-widest text-indigo-200 uppercase">Property Inspector</h2>
+                <div class="flex gap-1.5">
+                    <div class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
+                    <div class="w-2 h-2 rounded-full bg-indigo-500/50"></div>
+                </div>
+            </header>
+
+            <div class="p-6 overflow-y-auto flex-1 space-y-8 custom-scroll">
+                <!-- No Selection State -->
+                <div id="no-selection" class="flex flex-col items-center justify-center h-40 text-center opacity-40">
+                    <svg class="w-12 h-12 mb-3 text-dim" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5" />
+                    </svg>
+                    <p class="text-xs">Select an element to edit properties</p>
+                </div>
+
+                <!-- Entity Properties -->
+                <div id="entity-prop-form" class="hidden animate-in fade-in slide-in-from-right-4 duration-300">
+                    <div class="space-y-6">
+                        <div class="flex items-center justify-between">
+                            <label class="block text-[10px] font-bold text-dim uppercase tracking-tighter">Entity
+                                Name</label>
+                            <button id="deleteNodeProp" class="text-red-400 hover:text-red-300 transition-colors p-1"
+                                title="Delete Entity">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        </div>
+                        <input type="text" id="nodeName"
+                            class="w-full bg-black/50 border border-white/10 rounded-lg p-2.5 text-sm focus:border-indigo-500 outline-none transition-all">
+
+                        <div>
+                            <label
+                                class="block text-[10px] font-bold text-dim mb-2 uppercase tracking-tighter">Type</label>
+                            <select id="nodeType"
+                                class="w-full bg-black/50 border border-white/10 rounded-lg p-2.5 text-sm focus:border-indigo-500 outline-none transition-all">
+                                <optgroup label="General" class="bg-panel italic text-xs">
+                                    <option value="class">Class</option>
+                                    <option value="interface">Interface</option>
+                                    <option value="table">Table (ERD)</option>
+                                    <option value="usecase">Use Case</option>
+                                    <option value="actor">Actor</option>
+                                    <option value="system">Boundary/System</option>
+                                    <option value="note">Note</option>
+                                </optgroup>
+                                <optgroup label="Sequence Diagrams" class="bg-panel italic text-xs">
+                                    <option value="participant">Participant</option>
+                                    <option value="database">Database/Service</option>
+                                    <option value="boundary">Boundary Interface</option>
+                                    <option value="control">Control Logic</option>
+                                    <option value="entity">Entity Object</option>
+                                    <option value="alt">Alt Fragment</option>
+                                    <option value="loop">Loop Fragment</option>
+                                    <option value="activation">Activation Bar</option>
+                                </optgroup>
+                                <optgroup label="BPMN" class="bg-panel italic text-xs">
+                                    <option value="bpmn-task">BPMN Task</option>
+                                    <option value="bpmn-gateway">BPMN Gateway</option>
+                                    <option value="bpmn-start">BPMN Start Event</option>
+                                    <option value="bpmn-end">BPMN End Event</option>
+                                </optgroup>
+                                <optgroup label="Activity Diagram" class="bg-panel italic text-xs">
+                                    <option value="activity-action">Activity Action</option>
+                                    <option value="activity-decision">Activity Decision</option>
+                                    <option value="activity-initial">Initial Node</option>
+                                    <option value="activity-final">Final Node</option>
+                                </optgroup>
+                            </select>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label
+                                    class="block text-[10px] font-bold text-dim mb-2 uppercase tracking-tighter">Width</label>
+                                <input type="number" id="nodeWidth"
+                                    class="w-full bg-black/50 border border-white/10 rounded-lg p-2.5 text-sm focus:border-indigo-500 outline-none transition-all">
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-[10px] font-bold text-dim mb-2 uppercase tracking-tighter">Height</label>
+                                <input type="number" id="nodeHeight"
+                                    class="w-full bg-black/50 border border-white/10 rounded-lg p-2.5 text-sm focus:border-indigo-500 outline-none transition-all">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-[10px] font-bold text-dim mb-2 uppercase tracking-tighter">Attributes
+                                (one per line)</label>
+                            <textarea id="nodeAttributes" rows="4"
+                                class="w-full bg-black/50 border border-white/10 rounded-lg p-2.5 text-xs font-mono focus:border-indigo-500 outline-none transition-all resize-none"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-bold text-dim mb-2 uppercase tracking-tighter">Methods
+                                (one per line)</label>
+                            <textarea id="nodeMethods" rows="4"
+                                class="w-full bg-black/50 border border-white/10 rounded-lg p-2.5 text-xs font-mono focus:border-indigo-500 outline-none transition-all resize-none"></textarea>
+                        </div>
+
+                        <div class="pt-4 border-t border-white/5 space-y-3">
+                            <button id="deleteNode"
+                                class="w-full py-2.5 bg-red-900/20 hover:bg-red-900/40 border border-red-900/50 text-red-200 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                DELETE ENTITY
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <!-- Relationship Properties -->
+                <div id="rel-prop-form" class="hidden animate-in fade-in slide-in-from-right-4 duration-300">
+                    <div class="space-y-6">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-bold text-dim mb-2 uppercase tracking-tighter">From
+                                    (Source)</label>
+                                <input type="text" id="relFromLabel" placeholder="1, N, *"
+                                    class="w-full bg-black/50 border border-white/10 rounded-lg p-2.5 text-sm focus:border-indigo-500 outline-none transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-dim mb-2 uppercase tracking-tighter">To
+                                    (Target)</label>
+                                <input type="text" id="relToLabel" placeholder="1, N, *"
+                                    class="w-full bg-black/50 border border-white/10 rounded-lg p-2.5 text-sm focus:border-indigo-500 outline-none transition-all">
+                            </div>
+                        </div>
+                        <div class="hidden">
+                            <input type="text" id="relLabel">
+                        </div>
+                        <!-- Anchor Selection -->
+                        <div id="anchor-selection-group" class="space-y-4 pt-2 border-t border-white/5">
+                            <div>
+                                <label class="block text-[10px] font-bold text-dim mb-3 uppercase tracking-tighter">Start Point</label>
+                                <div class="flex gap-2">
+                                    <button class="anchor-opt" data-side="top" onclick="setRelAnchor('from', 'top')">T</button>
+                                    <button class="anchor-opt" data-side="bottom" onclick="setRelAnchor('from', 'bottom')">B</button>
+                                    <button class="anchor-opt" data-side="left" onclick="setRelAnchor('from', 'left')">L</button>
+                                    <button class="anchor-opt" data-side="right" onclick="setRelAnchor('from', 'right')">R</button>
+                                    <div class="w-px bg-white/10 mx-1"></div>
+                                    <button class="anchor-opt" data-side="auto" onclick="setRelAnchor('from', null)">A</button>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-dim mb-3 uppercase tracking-tighter">End Point</label>
+                                <div class="flex gap-2">
+                                    <button class="anchor-opt" data-side="top" onclick="setRelAnchor('to', 'top')">T</button>
+                                    <button class="anchor-opt" data-side="bottom" onclick="setRelAnchor('to', 'bottom')">B</button>
+                                    <button class="anchor-opt" data-side="left" onclick="setRelAnchor('to', 'left')">L</button>
+                                    <button class="anchor-opt" data-side="right" onclick="setRelAnchor('to', 'right')">R</button>
+                                    <div class="w-px bg-white/10 mx-1"></div>
+                                    <button class="anchor-opt" data-side="auto" onclick="setRelAnchor('to', null)">A</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-bold text-dim mb-2 uppercase tracking-tighter">Line
+                                Type</label>
+                            <select id="relType"
+                                class="w-full bg-black/50 border border-white/10 rounded-lg p-2.5 text-sm focus:border-indigo-500 outline-none transition-all">
+                                <option value="association">Association (---&gt;)</option>
+                                <option value="inheritance">Inheritance (--|&gt;)</option>
+                                <option value="composition">Composition (*--)</option>
+                                <option value="aggregation">Aggregation (o--)</option>
+                                <option value="dependency">Dependency (..&gt;)</option>
+                                <option value="dependency">Dependency (..&gt;)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-dim mb-2 uppercase tracking-tighter">Line
+                                Thickness</label>
+                            <input type="range" id="relThickness" min="1" max="8" step="1"
+                                class="w-full h-1.5 bg-black/50 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+                            <div class="flex justify-between text-[8px] text-dim mt-1">
+                                <span>Thin</span>
+                                <span>Thick</span>
+                            </div>
+                        </div>
+                        <div class="pt-4 border-t border-white/5">
+                            <button id="deleteRel"
+                                class="w-full py-2.5 bg-red-900/20 hover:bg-red-900/40 border border-red-900/50 text-red-200 rounded-lg text-xs font-bold transition-all">
+                                REMOVE CONNECTION
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="p-4 border-t border-indigo-900/30 bg-gray-900/30">
+                <p class="text-[9px] text-center text-dim uppercase tracking-widest leading-relaxed">Changes are
+                    auto-saved to current session</p>
+            </footer>
+        </aside>
+    </div>
+
+    <!-- UI Overlay / Modals -->
+    <div id="exportModal"
+        class="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] hidden items-center justify-center p-4">
+        <div
+            class="bg-panel border border-indigo-500/30 rounded-2xl max-w-lg w-full p-8 shadow-2xl animate-in zoom-in-95 duration-200">
+            <div class="text-center mb-6">
+                <div
+                    class="w-16 h-16 bg-indigo-600/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-indigo-500/20">
+                    <svg class="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold heading-font mb-2">Editor Synced!</h3>
+                <p class="text-dim text-sm">Your visual changes have been applied to the model. Return to the main page
+                    to generate your final diagram and code.</p>
+            </div>
+            <div class="flex gap-4">
+                <button id="stayBtn"
+                    class="flex-1 py-3 border border-white/10 hover:bg-white/5 rounded-xl font-medium transition-all">Stay
+                    Here</button>
+                <button id="closeEditorBtn"
+                    class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold btn-glow transition-all">Close
+                    & Return</button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="editor.js"></script>
+    <script src="theme-toggle.js"></script>
+</body>
+
+</html>

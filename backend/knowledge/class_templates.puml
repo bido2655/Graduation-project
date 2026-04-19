@@ -1,0 +1,83 @@
+### E-commerce System
+@startuml
+class User {
+  id: int
+  username: string
+  email: string
+  register()
+  login()
+}
+
+class Product {
+  id: int
+  name: string
+  price: decimal
+  stock: int
+}
+
+class Order {
+  id: int
+  orderDate: Date
+  status: string
+  calculateTotal()
+}
+
+class OrderItem {
+  quantity: int
+  price: decimal
+}
+
+User "1" -- "0..*" Order : places
+Order "1" *-- "1..*" OrderItem : contains
+OrderItem "0..*" -- "1" Product : references
+@enduml
+
+### Library Management System
+@startuml
+class Book {
+  id: int
+  title: string
+  isbn: string
+  availability: boolean
+}
+
+class Member {
+  id: int
+  name: string
+  membershipDate: Date
+}
+
+class Loan {
+  id: int
+  loanDate: Date
+  returnDate: Date
+}
+
+Member "1" -- "0..*" Loan : borrows
+Loan "1" -- "1" Book : involves
+@enduml
+
+### Banking System
+@startuml
+class Customer {
+  id: int
+  name: string
+  address: string
+}
+
+class Account {
+  accountNumber: string
+  balance: decimal
+  deposit(amount: decimal)
+  withdraw(amount: decimal)
+}
+
+class Transaction {
+  id: int
+  amount: decimal
+  timestamp: DateTime
+}
+
+Customer "1" -- "1..*" Account : owns
+Account "1" -- "0..*" Transaction : records
+@enduml

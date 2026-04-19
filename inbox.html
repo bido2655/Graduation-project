@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Inbox - Diagram AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="theme.css">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+
+        .glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .neon-border {
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.1);
+        }
+
+        .neon-text {
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+
+        .email-item:hover {
+            background: rgba(56, 189, 248, 0.05);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen p-4 md:p-8">
+    <div class="max-w-4xl mx-auto">
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold neon-text text-sky-400">Local Demo Inbox</h1>
+                <p class="text-slate-400 mt-1">Simulated emails for your graduation project presentation.</p>
+            </div>
+            <div class="flex gap-4">
+                <button onclick="fetchEmails()"
+                    class="px-4 py-2 rounded-lg glass neon-border hover:bg-sky-500/10 transition">Refresh</button>
+                <button onclick="clearInbox()"
+                    class="px-4 py-2 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 transition">Clear
+                    All</button>
+            </div>
+        </header>
+
+        <div id="emailList" class="space-y-4">
+            <!-- Emails will be loaded here -->
+            <div class="glass p-12 rounded-2xl text-center text-slate-500">
+                <p>Checking for new messages...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Detail Modal -->
+    <div id="emailModal"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div
+            class="glass max-w-2xl w-full rounded-2xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300">
+            <div class="p-6 border-b border-white/10 flex justify-between items-start">
+                <div>
+                    <h2 id="modalSubject" class="text-2xl font-bold text-sky-400 mb-1"></h2>
+                    <p id="modalFrom" class="text-slate-400 text-sm"></p>
+                </div>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white">&times;</button>
+            </div>
+            <div class="p-8 whitespace-pre-wrap text-slate-300 leading-relaxed max-h-[60vh] overflow-y-auto"
+                id="modalBody"></div>
+            <div class="p-6 bg-white/5 flex justify-end">
+                <button onclick="closeModal()"
+                    class="px-6 py-2 rounded-lg bg-sky-500 hover:bg-sky-400 text-white font-medium transition">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://127.0.0.1:8002/emails';
+
+        async function fetchEmails() {
+            try {
+                const response = await fetch(API_URL);
+                const emails = await response.json();
+                renderEmails(emails);
+            } catch (err) {
+                console.error("Failed to fetch emails:", err);
+                document.getElementById('emailList').innerHTML = `
+                    <div class="glass p-12 rounded-2xl text-center text-red-400 border-red-500/30">
+                        <p>Error connecting to backend Check if port 8002 is running.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderEmails(emails) {
+            const list = document.getElementById('emailList');
+            if (emails.length === 0) {
+                list.innerHTML = `
+                    <div class="glass p-12 rounded-2xl text-center text-slate-500">
+                        <p>Your inbox is empty. Try a password reset or sign up!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = emails.map(email => `
+                <div onclick="openEmail(${JSON.stringify(email).replace(/"/g, '&quot;')})" 
+                     class="glass p-5 rounded-xl cursor-pointer email-item transition group relative border-l-4 ${email.is_read ? 'border-transparent' : 'border-sky-500'}">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-lg text-slate-200 group-hover:text-sky-400 transition">${email.subject}</h3>
+                        <span class="text-xs text-slate-500">${new Date(email.sent_at).toLocaleString()}</span>
+                    </div>
+                    <div class="flex justify-between items-end">
+                        <div class="text-slate-400 text-sm truncate max-w-[80%]">
+                            To: <span class="text-slate-300">${email.recipient}</span>
+                        </div>
+                        <div class="text-sky-500 text-xs font-bold uppercase tracking-wider">From: Diagram AI</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function clearInbox() {
+            if (!confirm("Are you sure you want to clear the entire local inbox?")) return;
+            try {
+                await fetch('http://127.0.0.1:8002/emails/clear', { method: 'POST' });
+                fetchEmails();
+            } catch (err) {
+                console.error("Failed to clear inbox:", err);
+            }
+        }
+
+        function openEmail(email) {
+            document.getElementById('modalSubject').textContent = email.subject;
+            document.getElementById('modalFrom').textContent = `From: Diagram AI Support <support@diagram-ai.demo>`;
+            document.getElementById('modalBody').textContent = email.body;
+            document.getElementById('emailModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('emailModal').classList.add('hidden');
+        }
+
+        // Initial load
+        window.onload = fetchEmails;
+        // Auto-refresh every 10 seconds
+        setInterval(fetchEmails, 10000);
+    </script>
+    <script src="theme-toggle.js"></script>
+</body>
+
+</html>
